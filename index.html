@@ -42,7 +42,6 @@
 
         <div id="chargeScreen" style="display: none;">
             <h2>Payment Amount</h2>
-            <input type="number" id="amount" step="0.01" placeholder="Amount ($)">
             <div id="chargeButtons">
                 <button class="charge-btn" onclick="setAmount(35)">$35</button>
                 <button class="charge-btn" onclick="setAmount(40)">$40</button>
@@ -56,6 +55,7 @@
                 <button class="charge-btn" onclick="setAmount(80)">$80</button>
                 <button class="charge-btn" onclick="setAmount(85)">$85</button>
                 <button class="charge-btn" onclick="setAmount(90)">$90</button>
+                <button class="charge-btn" onclick="setAmount('variable')">Custom</button>
                 <button class="charge-btn" onclick="setAmount(95)">$95</button>
             </div>
             <button id="moreChargeBtn" onclick="showMoreCharges()">More</button>
@@ -72,7 +72,6 @@
                 <button class="charge-btn" onclick="setAmount(145)">$145</button>
                 <button class="charge-btn" onclick="setAmount(150)">$150</button>
             </div>
-            <button class="charge-btn" onclick="setAmount('variable')">Custom</button>
             <button id="chargeBtn" onclick="triggerPayment()">Pay Now</button>
         </div>
         
