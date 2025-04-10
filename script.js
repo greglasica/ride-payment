@@ -89,7 +89,10 @@ function onOurWay() {
                     document.getElementById('toggleDetailsBtn').style.display = 'block';
                     document.getElementById('toggleDetailsBtn').innerText = 'Show Ride Details';
                     document.getElementById('map').style.height = '400px';
-                    navOptions.style.display = 'flex'; // Show navigation buttons
+                    navOptions.style.display = 'flex';
+                    // Update button onclicks for start address
+                    document.getElementById('googleNavBtn').onclick = () => navigateToStart('google');
+                    document.getElementById('appleNavBtn').onclick = () => navigateToStart('apple');
                     console.log('On Our Way: Navigation options shown for pickup');
                 } else {
                     document.getElementById('status').innerText = 'Failed to calculate ETA.';
@@ -214,8 +217,11 @@ function startRide() {
                 startRideBtn.style.display = 'none';
                 finishRideBtn.style.display = 'block';
                 navOptions.style.display = 'flex';
+                // Update button onclicks for destination
+                document.getElementById('googleNavBtn').onclick = () => navigateToDestination('google');
+                document.getElementById('appleNavBtn').onclick = () => navigateToDestination('apple');
                 startTime = new Date();
-                console.log('Start Ride: Route updated, navigation options shown');
+                console.log('Start Ride: Route updated, navigation options shown for destination');
             } else {
                 statusDiv.innerText = 'Failed to update route: ' + status;
                 console.error('Start Ride: Directions API failed:', status);
@@ -231,14 +237,14 @@ function startRide() {
     });
 }
 
-function navigate(app) {
-    const destinationInput = document.getElementById('destination');
+function navigateToStart(app) {
+    const startAddressInput = document.getElementById('startAddress');
     const statusDiv = document.getElementById('status');
-    const destination = destinationInput ? destinationInput.value : '';
+    const startAddress = startAddressInput ? startAddressInput.value : '';
 
-    if (!destination) {
-        statusDiv.innerText = 'No destination provided.';
-        console.log('Navigate: No destination provided');
+    if (!startAddress) {
+        statusDiv.innerText = 'No start address provided.';
+        console.log('NavigateToStart: No start address provided');
         return;
     }
 
@@ -247,38 +253,90 @@ function navigate(app) {
             lat: position.coords.latitude,
             lng: position.coords.longitude
         };
-        console.log('Navigate: Current Location:', currentLocation);
+        console.log('NavigateToStart: Current Location:', currentLocation);
+
+        const origin = `${currentLocation.lat},${currentLocation.lng}`;
+        const encodedDest = encodeURIComponent(startAddress);
+
+        if (app === 'google') {
+            const googleAppUrl = `comgooglemaps://?saddr=${origin}&daddr=${encodedDest}&directionsmode=driving`;
+            window.location.href = googleAppUrl;
+            setTimeout(() => {
+                if (document.hasFocus()) {
+                    statusDiv.innerText = 'Google Maps app not installed. Please install it to navigate.';
+                    console.log('NavigateToStart: Google Maps app not installed');
+                } else {
+                    console.log('NavigateToStart: Google Maps app opened');
+                }
+            }, 1000);
+        } else if (app === 'apple') {
+            const appleAppUrl = `maps://?saddr=${origin}&daddr=${encodedDest}&dirflg=d`;
+            window.location.href = appleAppUrl;
+            setTimeout(() => {
+                if (document.hasFocus()) {
+                    statusDiv.innerText = 'Apple Maps app not installed. Please install it to navigate.';
+                    console.log('NavigateToStart: Apple Maps app not installed');
+                } else {
+                    console.log('NavigateToStart: Apple Maps app opened');
+                }
+            }, 1000);
+        }
+    }, error => {
+        console.error('NavigateToStart: Geolocation error:', error.message, 'Code:', error.code);
+        statusDiv.innerText = `Navigation failed: ${error.message}`;
+    }, {
+        maximumAge: 0,
+        timeout: 10000,
+        enableHighAccuracy: true
+    });
+}
+
+function navigateToDestination(app) {
+    const destinationInput = document.getElementById('destination');
+    const statusDiv = document.getElementById('status');
+    const destination = destinationInput ? destinationInput.value : '';
+
+    if (!destination) {
+        statusDiv.innerText = 'No destination provided.';
+        console.log('NavigateToDestination: No destination provided');
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(position => {
+        const currentLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        };
+        console.log('NavigateToDestination: Current Location:', currentLocation);
 
         const origin = `${currentLocation.lat},${currentLocation.lng}`;
         const encodedDest = encodeURIComponent(destination);
 
         if (app === 'google') {
             const googleAppUrl = `comgooglemaps://?saddr=${origin}&daddr=${encodedDest}&directionsmode=driving`;
-            // Attempt to open Google Maps app only
             window.location.href = googleAppUrl;
             setTimeout(() => {
                 if (document.hasFocus()) {
                     statusDiv.innerText = 'Google Maps app not installed. Please install it to navigate.';
-                    console.log('Navigate: Google Maps app not installed');
+                    console.log('NavigateToDestination: Google Maps app not installed');
                 } else {
-                    console.log('Navigate: Google Maps app opened');
+                    console.log('NavigateToDestination: Google Maps app opened');
                 }
             }, 1000);
         } else if (app === 'apple') {
             const appleAppUrl = `maps://?saddr=${origin}&daddr=${encodedDest}&dirflg=d`;
-            // Attempt to open Apple Maps app only
             window.location.href = appleAppUrl;
             setTimeout(() => {
                 if (document.hasFocus()) {
                     statusDiv.innerText = 'Apple Maps app not installed. Please install it to navigate.';
-                    console.log('Navigate: Apple Maps app not installed');
+                    console.log('NavigateToDestination: Apple Maps app not installed');
                 } else {
-                    console.log('Navigate: Apple Maps app opened');
+                    console.log('NavigateToDestination: Apple Maps app opened');
                 }
             }, 1000);
         }
     }, error => {
-        console.error('Navigate: Geolocation error:', error.message, 'Code:', error.code);
+        console.error('NavigateToDestination: Geolocation error:', error.message, 'Code:', error.code);
         statusDiv.innerText = `Navigation failed: ${error.message}`;
     }, {
         maximumAge: 0,
