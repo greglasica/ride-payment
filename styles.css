@@ -206,6 +206,11 @@ input[type="text"], input[type="tel"] {
     background-color: #e0a800;
 }
 
+.tip-btn.selected {
+    background-color: #28a745; /* Green when pressed */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 #finishBtn {
     width: 100%;
     padding: 12px;
