@@ -10,6 +10,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+app.use('/public', express.static(path.join(__dirname, 'public'))); // Add this if not present
 
 const twilioClient = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
 const twilioNumber = process.env.TWILIO_NUMBER;
@@ -40,8 +41,13 @@ app.post('/api/send-sms', (req, res) => {
         body: message,
         from: twilioNumber,
         to: to
-    }).then(() => res.json({ status: 'success' }))
-      .catch(err => res.status(500).json({ status: 'error', message: err.message }));
+    }).then(() => {
+        console.log('SMS sent successfully to:', to);
+        res.json({ status: 'success' });
+    }).catch(err => {
+        console.error('SMS send error:', err.message);
+        res.status(500).json({ status: 'error', message: err.message });
+    });
 });
 
 app.post('/api/process-payment', async (req, res) => {
