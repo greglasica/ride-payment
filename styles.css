@@ -367,13 +367,15 @@ input[type="text"], input[type="tel"] {
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
-    box-sizing: border-box; /* Ensures padding doesn’t affect width */
-    min-height: 40px; /* Consistent height */
+    box-sizing: border-box;
+    min-height: 40px;
 }
 
 #updateEmail {
-    width: 100%;
-    min-height: 40px;
+    width: 100% !important; /* Override any conflicts */
+    min-height: 40px !important;
+    padding: 10px !important;
+    font-size: 16px !important;
 }
 
 #saveProfileBtn, #cancelProfileBtn {
