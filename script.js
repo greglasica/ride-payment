@@ -79,6 +79,9 @@ function onOurWay() {
                     document.getElementById('status').innerText = `On our way to pickup. ETA: ${eta}`;
                     document.getElementById('onOurWayBtn').style.display = 'none';
                     document.getElementById('arriveBtn').style.display = 'block';
+                    document.getElementById('rideDetails').style.display = 'none'; // Hide details
+                    document.getElementById('toggleDetailsBtn').innerText = 'Show Ride Details';
+                    document.getElementById('map').style.height = '400px'; // Expand map
                 } else {
                     document.getElementById('status').innerText = 'Failed to calculate ETA.';
                 }
@@ -245,6 +248,18 @@ window.onload = function() {
         console.log('Initialization failed:', error.message || error);
     });
 };
+
+function toggleRideDetails() {
+    const rideDetails = document.getElementById('rideDetails');
+    const toggleBtn = document.getElementById('toggleDetailsBtn');
+    if (rideDetails.style.display === 'none' || rideDetails.style.display === '') {
+        rideDetails.style.display = 'block';
+        toggleBtn.innerText = 'Hide Ride Details';
+    } else {
+        rideDetails.style.display = 'none';
+        toggleBtn.innerText = 'Show Ride Details';
+    }
+}
 
 // Update profile
 function showUpdateProfile() {

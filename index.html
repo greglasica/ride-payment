@@ -11,28 +11,27 @@
     <div class="container">
         <div id="paymentScreen">
             <div class="menu-container">
-                <button id="hamburgerBtn" onclick="toggleMenu(event)">☰</button>                
+                <button id="hamburgerBtn" onclick="toggleMenu(event)">☰</button>
                 <div id="menuDropdown" class="dropdown-menu">
                     <button onclick="showUpdateProfile()">Update Profile</button>
-                    <button onclick="showHistory()">View Ride History</button>
+                    <button onclick="showHistory()">Ride History</button>
                     <button onclick="chargeNow()">Charge Now</button>
                 </div>
             </div>
             <h2>Ride Payment</h2>
-            <input type="text" id="startAddress" placeholder="Start Address">
-            <input type="text" id="destination" placeholder="Destination">
-            <input type="tel" id="clientPhone" placeholder="Client Phone (e.g., 2345678900)">
+            <button id="toggleDetailsBtn" onclick="toggleRideDetails()">Show Ride Details</button>
+            <div id="rideDetails" style="display: block;">
+                <input type="text" id="startAddress" placeholder="Start Address">
+                <input type="text" id="destination" placeholder="Destination">
+                <input type="tel" id="clientPhone" placeholder="Client Phone (e.g., 12345678900)" required>
+            </div>
             <button id="onOurWayBtn" onclick="onOurWay()">On Our Way</button>
             <button id="arriveBtn" onclick="arrive()" style="display: none;">Arrive</button>
             <button id="startRideBtn" onclick="startRide()" style="display: none;">Start Ride</button>
             <button id="finishRideBtn" onclick="finishRide()" style="display: none;">Finish Ride</button>
             <div id="map" style="height: 200px; width: 100%; margin: 10px 0;"></div>
-            <input type="hidden" id="amount" value="">
-            <input type="text" id="note" placeholder="Ride note (optional)">
-            <input type="hidden" id="driverName" value="">
-            <input type="hidden" id="driverEmail" value="">
-
-        </div> <!-- closing paymentScreen -->
+        </div>
+   
 
         <div id="chargeScreen" style="display: none;">
             <h2>Charge Ride Amount</h2>
