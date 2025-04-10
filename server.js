@@ -2,8 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const twilio = require('twilio');
 const Square = require('square');
-const nodemailer = require('nodemailer'); // Add this line
+const nodemailer = require('nodemailer');
 const path = require('path');
+
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -18,9 +19,7 @@ const squareClient = new Square.Client({
 });
 const squareAppId = process.env.SQUARE_APP_ID;
 const squareLocationId = process.env.SQUARE_LOCATION_ID;
-const nodemailer = require('nodemailer');
 
-// Nodemailer setup
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -29,8 +28,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-
-// SMS endpoint
+// Routes...
 app.post('/api/send-sms', (req, res) => {
     const { to, message } = req.body;
     twilioClient.messages.create({
@@ -41,7 +39,6 @@ app.post('/api/send-sms', (req, res) => {
       .catch(err => res.status(500).json({ status: 'error', message: err.message }));
 });
 
-// Payment endpoint
 app.post('/api/process-payment', async (req, res) => {
     const { amount, token } = req.body;
     try {
@@ -57,15 +54,12 @@ app.post('/api/process-payment', async (req, res) => {
     }
 });
 
-// Serve index.html
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
-// Expose Square App ID (optional, for client-side use in script.js)
 app.get('/config', (req, res) => {
     res.json({ squareAppId: squareAppId });
 });
 
-// Email sending endpoint
 app.post('/api/send-email', async (req, res) => {
     const { adminSubject, adminBody, driverSubject, driverBody, driverEmail } = req.body;
 
