@@ -71,26 +71,9 @@ function onOurWay() {
                     const duration = result.routes[0].legs[0].duration.value / 60; // Minutes
                     const eta = new Date(startTime.getTime() + duration * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                    // Use server endpoint instead of direct Twilio API call
-                    fetch('/api/send-sms', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            to: clientPhone,
-                            message: `Your driver, ${driverName}, is on the way from their location. Estimated ETA to your pickup: ${eta}`
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            console.log('SMS sent:', data);
-                        } else {
-                            console.error('SMS failed:', data.message);
-                        }
-                    })
-                    .catch(error => console.error('SMS failed:', error));
+                    // Open iPhone Messages app with pre-filled SMS
+                    const smsMessage = `Your driver, ${driverName}, is on the way from their location. Estimated ETA to your pickup: ${eta}`;
+                    window.location.href = `sms:${clientPhone}&body=${encodeURIComponent(smsMessage)}`;
 
                     document.getElementById('status').innerText = `On our way to pickup. ETA: ${eta}`;
                     document.getElementById('onOurWayBtn').style.display = 'none';
