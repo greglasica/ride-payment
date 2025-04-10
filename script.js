@@ -107,28 +107,63 @@ function onOurWay() {
 
 // Arrive at customer's pickup location
 function arrive() {
-    const startAddress = document.getElementById('startAddress').value;
-    const destination = document.getElementById('destination').value;
+    const startAddressInput = document.getElementById('startAddress');
+    const destinationInput = document.getElementById('destination');
+    const statusDiv = document.getElementById('status');
+
+    const startAddress = startAddressInput ? startAddressInput.value : '';
+    const destination = destinationInput ? destinationInput.value : '';
+
+    console.log('Arrive called - Start Address:', startAddress, 'Destination:', destination);
+
     if (!startAddress || !destination) {
-        document.getElementById('status').innerText = 'Please enter start address and destination.';
+        statusDiv.innerText = 'Please enter start address and destination.';
+        console.log('Missing startAddress or destination');
         return;
     }
+
     if (navigator.geolocation) {
+        statusDiv.innerText = 'Fetching pickup location...';
+        console.log('Fetching geolocation...');
         navigator.geolocation.getCurrentPosition(position => {
             startLocation = {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
+            console.log('Geolocation success - Start Location:', startLocation);
             map.setCenter(startLocation);
-            document.getElementById('status').innerText = 'Arrived at pickup. Waiting...';
+
+            const request = {
+                origin: new google.maps.LatLng(startLocation.lat, startLocation.lng),
+                destination: destination,
+                travelMode: 'DRIVING'
+            };
+            console.log('Routing request:', request);
+
+            directionsService.route(request, (result, status) => {
+                console.log('Directions API response - Status:', status, 'Result:', result);
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(result);
+                    statusDiv.innerText = 'Arrived at pickup. Route to destination updated.';
+                } else {
+                    statusDiv.innerText = 'Failed to update route: ' + status;
+                    console.error('Directions API failed:', status);
+                }
+            });
+
             document.getElementById('arriveBtn').style.display = 'none';
-            document.getElementById('startRideBtn').style.display = 'block'; // Show Start Ride
-            waitStartTime = new Date(); // Start wait clock
-        }, () => {
-            document.getElementById('status').innerText = 'Geolocation failed.';
+            document.getElementById('startRideBtn').style.display = 'block';
+        }, error => {
+            console.error('Geolocation error:', error.message, 'Code:', error.code);
+            statusDiv.innerText = `Geolocation failed: ${error.message}`;
+        }, {
+            maximumAge: 0,
+            timeout: 10000,
+            enableHighAccuracy: true
         });
     } else {
-        document.getElementById('status').innerText = 'Geolocation not supported.';
+        statusDiv.innerText = 'Geolocation not supported.';
+        console.log('Geolocation not supported');
     }
 }
 
