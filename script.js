@@ -15,13 +15,13 @@ function setTipLabels(baseAmount) {
 // Initialize Google Map
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: 44.8549, lng: -93.4708 }, // Chaska, MN default
+        center: { lat: 44.8549, lng: -93.4708 },
         zoom: 12
     });
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer();
     directionsRenderer.setMap(map);
-    initAutocomplete(); // Enable autofill
+    initAutocomplete();
 }
 
 // Initialize Autocomplete for address inputs
@@ -630,7 +630,7 @@ document.addEventListener('click', function(event) {
     if (menu.style.display === 'block' && !menu.contains(event.target) && !menuButton.contains(event.target)) {
         menu.style.display = 'none';
     }
-);
+});
 
 /// Show ride history
 function showHistory() {
