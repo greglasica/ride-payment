@@ -580,10 +580,12 @@ async function finishPayment() {
     const fixedFare = (distance * 1.60 + time * 0.41).toFixed(2);
     const chargedAmount = amount.toFixed(2);
 
+    
+
     // Admin email
-    const adminEmail = 'minndriveairport@gmail.com';
-    const subject = encodeURIComponent(`MinnDrive Ride Review - ${dateTime}`);
-    const body = encodeURIComponent(`
+    // Define email content
+const adminSubject = `MinnDrive Ride Review - ${dateTime}`;
+const adminBody = `
 MinnDrive Ride Review
 Driver: ${driverName}
 Start Address: ${ride.startAddress}
@@ -598,11 +600,10 @@ Ride Breakdown:
 - Actual Amount Charged: $${chargedAmount}
 - Driver Pay: $${driverPay} (72% Fare + 100% Tip)
 - Note: ${note}
-    `.trim());
-    window.open(`mailto:${adminEmail}?subject=${subject}&body=${body}`, '_blank');
+`.trim();
 
-    // Driver receipt email
-    const receipt = `
+const driverSubject = `MinnDrive Receipt - ${dateTime}`;
+const driverBody = `
 MinnDrive Receipt
 3333 Lake Shore Ct, Chaska, MN 55318
 Date/Time: ${dateTime}
@@ -612,14 +613,40 @@ Ride Details:
 - Start: ${ride.startAddress}
 - Destination: ${ride.destination}
 - Fare: $${baseFare.toFixed(2)}
+- Wait Cost: $${ride.waitCost}
 - Tip: $${tipAmount}
 - Total: $${chargedAmount}
 
 Thank you for choosing MinnDrive!
-    `.trim();
-    const driverSubject = encodeURIComponent(`MinnDrive Receipt - ${dateTime}`);
-    const driverBody = encodeURIComponent(receipt);
-    window.open(`mailto:${driverEmail}?subject=${driverSubject}&body=${driverBody}`, '_blank');
+`.trim();
+
+// Send emails in background
+await fetch('/api/send-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        adminSubject,
+        adminBody,
+        driverSubject,
+        driverBody,
+        driverEmail
+    })
+})
+.then(response => response.json())
+.then(data => {
+    if (data.status === 'success') {
+        console.log('Emails sent successfully');
+    } else {
+        console.error('Email send failed:', data.message);
+        statusDiv.innerText = 'Email send failed: ' + data.message;
+        statusDiv.className = 'error';
+    }
+})
+.catch(error => {
+    console.error('Email send error:', error);
+    statusDiv.innerText = 'Email send error: ' + error.message;
+    statusDiv.className = 'error';
+});
 
     statusDiv.innerText = 'Payment Successful! Total: $' + chargedAmount;
     statusDiv.className = 'success';
