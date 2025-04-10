@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Driver and Payment App</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+    <script src="https://web.squarecdn.com/v1/square.js"></script>
 </head>
 <body>
     <div class="container">
@@ -153,5 +153,14 @@
             }
         });
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbAlIDzeZs45VncY9pT-WqnTlNafqj_Gw&libraries=places&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbAlIDzeZs45VncY9pT-WqnTlNafqj_Gw&libraries=places" async defer></script>
+<script>
+    window.addEventListener('load', () => {
+        if (typeof initMap === 'function') {
+            initMap();
+        } else {
+            console.error('initMap not defined');
+        }
+    });
+</script>
     </html>
