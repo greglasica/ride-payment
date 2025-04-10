@@ -4,8 +4,20 @@ const twilio = require('twilio');
 const Square = require('square');
 const nodemailer = require('nodemailer'); // Keep this one
 const path = require('path');
-
 const app = express();
+
+app.get('/config', (req, res) => {
+    const squareAppId = process.env.SQUARE_APP_ID;
+    const squareLocationId = process.env.SQUARE_LOCATION_ID;
+    if (!squareAppId || !squareLocationId) {
+        console.error('Missing Square credentials in .env');
+        return res.status(500).json({ error: 'Server configuration error' });
+    }
+    res.json({
+        squareAppId: squareAppId,
+        squareLocationId: squareLocationId
+    });
+});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -66,10 +78,6 @@ app.post('/api/process-payment', async (req, res) => {
 });
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
-
-app.get('/config', (req, res) => {
-    res.json({ squareAppId: squareAppId });
-});
 
 app.post('/api/send-email', async (req, res) => {
     const { adminSubject, adminBody, driverSubject, driverBody, driverEmail } = req.body;

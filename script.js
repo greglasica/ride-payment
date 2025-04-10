@@ -19,7 +19,31 @@ let startLocation, endLocation, startTime, endTime;
 let squarePayments;
 let waitStartTime;
 let waitCost = 0;
-let selectedTip = null; // Add at top, after other globals like waitCost
+let selectedTip = null;
+
+async function initializeSquare() {
+    try {
+        console.log('Starting Square initialization...');
+        const response = await fetch('/config');
+        if (!response.ok) {
+            throw new Error(`Fetch /config failed: ${response.statusText}`);
+        }
+        const config = await response.json();
+        if (!config.squareAppId || !config.squareLocationId) {
+            throw new Error('Missing squareAppId or squareLocationId in /config response');
+        }
+        if (!window.Square) {
+            throw new Error('Square SDK not loaded - check script in index.html');
+        }
+        squarePayments = await window.Square.payments(config.squareAppId, config.squareLocationId);
+        console.log('Square Payments initialized successfully');
+    } catch (error) {
+        console.error('Failed to initialize Square:', error.message);
+        squarePayments = null; // Ensure it’s null if failed
+    }
+}
+
+// Call it immediately
 
 // Helper function to set tip labels
 function setTipLabels(baseAmount) {
@@ -427,20 +451,6 @@ function capitalizeName(name) {
     return parts.join(' ');
 }
 
-async function initializeSquare() {
-    try {
-        const response = await fetch('/config');
-        const config = await response.json();
-        if (!window.Square) {
-            throw new Error('Square SDK not loaded - check script in index.html');
-        }
-        squarePayments = await window.Square.payments(config.squareAppId, config.squareLocationId);
-        console.log('Square Payments initialized successfully');
-    } catch (error) {
-        console.error('Failed to initialize Square:', error.message);
-    }
-}
-
 window.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
@@ -790,14 +800,14 @@ async function manualPayment() {
     manualCardScreen.style.display = 'block';
     chargeScreen.style.display = 'none';
     statusDiv.innerText = 'Loading card form...';
-    document.getElementById('ride-amount').innerText = window.baseAmount.toFixed(2); // Show base amount
+    document.getElementById('ride-amount').innerText = window.baseAmount.toFixed(2);
 
     try {
-        // Wait for squarePayments to be initialized
+        // Wait for squarePayments with timeout
         let attempts = 0;
-        while (!squarePayments && attempts < 5) {
+        while (!squarePayments && attempts < 10) { // Increased to 10s
             console.log('Waiting for squarePayments to initialize...');
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+            await new Promise(resolve => setTimeout(resolve, 1000));
             attempts++;
         }
         if (!squarePayments) {
@@ -826,7 +836,6 @@ async function manualPayment() {
             updateTipButtonStyles();
         };
 
-        // Back to charge screen
         document.getElementById('back-to-charge').onclick = () => {
             manualCardScreen.style.display = 'none';
             chargeScreen.style.display = 'block';
