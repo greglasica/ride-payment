@@ -459,7 +459,6 @@ function chargeNow() {
     const receiptScreen = document.getElementById('receiptScreen');
     const statusDiv = document.getElementById('status');
     const amountInput = document.getElementById('amount');
-    const noteInput = document.getElementById('note');
 
     // Hide other screens and show charge screen
     paymentScreen.style.display = 'none';
@@ -468,7 +467,6 @@ function chargeNow() {
 
     // Clear rider info only, keep driver info
     amountInput.value = '';
-    noteInput.value = '';
     document.getElementById('startAddress').value = '';
     document.getElementById('destination').value = '';
     document.getElementById('clientPhone').value = '';
@@ -523,33 +521,32 @@ function setAmount(price) {
 // Trigger Square payment with preset amount
 function triggerPayment() {
     const amountInput = document.getElementById('amount');
-    const noteInput = document.getElementById('note');
     const driverNameInput = document.getElementById('driverName');
     const statusDiv = document.getElementById('status');
     const chargeScreen = document.getElementById('chargeScreen');
     const paymentOptionsScreen = document.getElementById('paymentOptionsScreen');
     const amount = amountInput.value;
     const driverName = driverNameInput.value;
-    const note = noteInput.value || 'Ride Payment';
 
     if (!amount || amount <= 0 || isNaN(amount)) {
         statusDiv.innerText = 'Please select a valid amount';
         statusDiv.className = 'error';
+        console.log('Trigger Payment: Invalid amount');
         return;
     }
     if (!driverName) {
         statusDiv.innerText = 'Driver name not set';
         statusDiv.className = 'error';
+        console.log('Trigger Payment: Driver name missing');
         return;
     }
 
     console.log('Showing payment options with amount:', amount);
     window.baseAmount = parseFloat(amount);
-    window.paymentNote = note;
     chargeScreen.style.display = 'none';
     paymentOptionsScreen.style.display = 'block';
     statusDiv.innerText = 'Choose payment method';
-    setTipLabels(window.baseAmount); // Add here for preview
+    setTipLabels(window.baseAmount);
 }
 
 // Manual credit card payment
@@ -746,8 +743,6 @@ async function finishPayment() {
         time: ((endTime && startTime) ? ((endTime - startTime) / 60000).toFixed(1) : 'N/A'),
         waitCost: waitCost.toFixed(2)
     };
-    // ... rest of finishPayment (email sending, etc.) ...
-
     let history = JSON.parse(localStorage.getItem('rideHistory') || '[]');
     history.push(ride);
     localStorage.setItem('rideHistory', JSON.stringify(history));
@@ -758,12 +753,9 @@ async function finishPayment() {
     const fixedFare = (distance * 1.60 + time * 0.41).toFixed(2);
     const chargedAmount = amount.toFixed(2);
 
-    
-
-    // Admin email
-    // Define email content
-const adminSubject = `MinnDrive Ride Review - ${dateTime}`;
-const adminBody = `
+    // Email content without note
+    const adminSubject = `MinnDrive Ride Review - ${dateTime}`;
+    const adminBody = ``
 MinnDrive Ride Review
 Driver: ${driverName}
 Start Address: ${ride.startAddress}
@@ -838,7 +830,6 @@ await fetch('/api/send-email', {
         manualCardScreen.style.display = 'none';
         paymentOptionsScreen.style.display = 'none';
         amountInput.value = '';
-        noteInput.value = '';
         document.getElementById('startAddress').value = '';
         document.getElementById('destination').value = '';
         document.getElementById('clientPhone').value = '';
