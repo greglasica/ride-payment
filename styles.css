@@ -56,16 +56,28 @@ input[type="text"], input[type="tel"] {
 }
 
 /* New styles for payment options and manual card screens */
+#paymentOptionsScreen {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    max-width: 400px;
+    margin: 20px auto;
+    text-align: center; /* Center content */
+}
+
 #paymentOptionsScreen button {
-    width: 100%;
+    width: 80%; /* Slightly less than full width for centering */
+    max-width: 300px; /* Cap width */
     padding: 12px;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
     font-size: 16px;
-    margin: 10px 0;
+    margin: 10px auto; /* Center with auto margins */
+    display: block; /* Ensure block-level for centering */
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 #paymentOptionsScreen button:hover {
