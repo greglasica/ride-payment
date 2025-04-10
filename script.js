@@ -46,6 +46,7 @@ function onOurWay() {
     const destinationInput = document.getElementById('destination');
     const clientPhoneInput = document.getElementById('clientPhone');
     const driverNameInput = document.getElementById('driverName');
+    const navOptions = document.getElementById('navOptions');
 
     const startAddress = startAddressInput ? startAddressInput.value : '';
     const destination = destinationInput ? destinationInput.value : '';
@@ -85,9 +86,11 @@ function onOurWay() {
                     document.getElementById('onOurWayBtn').style.display = 'none';
                     document.getElementById('arriveBtn').style.display = 'block';
                     document.getElementById('rideDetails').style.display = 'none';
-                    document.getElementById('toggleDetailsBtn').style.display = 'block'; // Show toggle button
+                    document.getElementById('toggleDetailsBtn').style.display = 'block';
                     document.getElementById('toggleDetailsBtn').innerText = 'Show Ride Details';
                     document.getElementById('map').style.height = '400px';
+                    navOptions.style.display = 'flex'; // Show navigation buttons
+                    console.log('On Our Way: Navigation options shown for pickup');
                 } else {
                     document.getElementById('status').innerText = 'Failed to calculate ETA.';
                 }
