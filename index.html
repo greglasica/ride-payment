@@ -134,6 +134,23 @@
         </div>
         <div id="status"></div>
     </div>
-    <script src="script.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbAlIDzeZs45VncY9pT-WqnTlNafqj_Gw&libraries=places&callback=initMap" async defer></script>    </body>
+<script>
+    // Debug mode toggle - set to true to show all screens
+    const debugMode = true;
+    if (debugMode) {
+        document.addEventListener('DOMContentLoaded', () => {
+            const screens = [
+                'paymentScreen', 'chargeScreen', 'paymentOptionsScreen',
+                'manualCardScreen', 'venmoScreen', 'receiptScreen', 'updateProfileScreen'
+            ];
+            screens.forEach(id => {
+                const screen = document.getElementById(id);
+                if (screen) screen.style.display = 'block';
+            });
+            console.log('Debug mode: All screens displayed');
+        });
+    }
+</script>
+<script src="script.js" defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbAlIDzeZs45VncY9pT-WqnTlNafqj_Gw&libraries=places&callback=initMap" async defer></script>
     </html>
