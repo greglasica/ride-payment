@@ -110,13 +110,15 @@ function arrive() {
     const startAddressInput = document.getElementById('startAddress');
     const destinationInput = document.getElementById('destination');
     const statusDiv = document.getElementById('status');
+    const arriveBtn = document.getElementById('arriveBtn');
+    const startRideBtn = document.getElementById('startRideBtn');
 
     const startAddress = startAddressInput ? startAddressInput.value : '';
     const destination = destinationInput ? destinationInput.value : '';
 
     if (!startAddress || !destination) {
         statusDiv.innerText = 'Please enter start address and destination.';
-        console.log('Missing startAddress or destination');
+        console.log('Arrive: Missing startAddress or destination');
         return;
     }
 
@@ -130,11 +132,12 @@ function arrive() {
             };
             console.log('Arrive: Geolocation success - Start Location:', startLocation);
             map.setCenter(startLocation);
-            waitStartTime = new Date(); // Set waitStartTime here
+            waitStartTime = new Date();
             console.log('Arrive: waitStartTime set to', waitStartTime);
             statusDiv.innerText = 'Arrived at pickup.';
-            document.getElementById('arriveBtn').style.display = 'none';
-            document.getElementById('startRideBtn').style.display = 'block';
+            arriveBtn.style.display = 'none'; // Hide immediately
+            startRideBtn.style.display = 'block'; // Show immediately
+            console.log('Arrive: Button state updated - arriveBtn hidden, startRideBtn shown');
         }, error => {
             console.error('Arrive: Geolocation error:', error.message, 'Code:', error.code);
             statusDiv.innerText = `Geolocation failed: ${error.message}`;
@@ -152,6 +155,8 @@ function arrive() {
 function startRide() {
     const statusDiv = document.getElementById('status');
     const destinationInput = document.getElementById('destination');
+    const startRideBtn = document.getElementById('startRideBtn');
+    const finishRideBtn = document.getElementById('finishRideBtn');
     const destination = destinationInput ? destinationInput.value : '';
 
     if (!waitStartTime) {
@@ -197,15 +202,15 @@ function startRide() {
                     statusDiv.innerText = waitCost > 0 
                         ? `Wait time cost: $${waitCost.toFixed(2)}. Ride started, route updated.`
                         : 'Ride started, route updated.';
+                    startRideBtn.style.display = 'none';
+                    finishRideBtn.style.display = 'block';
+                    startTime = new Date();
+                    console.log('Start Ride: Route updated, UI transitioned to finishRideBtn');
                 } else {
                     statusDiv.innerText = 'Failed to update route: ' + status;
                     console.error('Start Ride: Directions API failed:', status);
                 }
             });
-
-            document.getElementById('startRideBtn').style.display = 'none';
-            document.getElementById('finishRideBtn').style.display = 'block';
-            startTime = new Date();
         }, error => {
             console.error('Start Ride: Geolocation error:', error.message, 'Code:', error.code);
             statusDiv.innerText = `Geolocation failed: ${error.message}`;
