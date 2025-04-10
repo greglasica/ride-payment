@@ -130,14 +130,9 @@ function arrive() {
 
     statusDiv.innerText = 'Fetching pickup location...';
     console.log('Arrive: Fetching geolocation...');
+    arriveBtn.disabled = true; // Prevent double-click
 
-    new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-            maximumAge: 0,
-            timeout: 10000,
-            enableHighAccuracy: true
-        });
-    }).then(position => {
+    navigator.geolocation.getCurrentPosition(position => {
         startLocation = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
@@ -150,9 +145,15 @@ function arrive() {
         arriveBtn.style.display = 'none';
         startRideBtn.style.display = 'block';
         console.log('Arrive: Button state updated - arriveBtn hidden, startRideBtn shown');
-    }).catch(error => {
+        arriveBtn.disabled = false; // Re-enable for future use
+    }, error => {
         console.error('Arrive: Geolocation error:', error.message, 'Code:', error.code);
         statusDiv.innerText = `Geolocation failed: ${error.message}`;
+        arriveBtn.disabled = false;
+    }, {
+        maximumAge: 0,
+        timeout: 10000,
+        enableHighAccuracy: true
     });
 }
 
@@ -161,6 +162,7 @@ function startRide() {
     const destinationInput = document.getElementById('destination');
     const startRideBtn = document.getElementById('startRideBtn');
     const finishRideBtn = document.getElementById('finishRideBtn');
+    const navOptions = document.getElementById('navOptions');
     const destination = destinationInput ? destinationInput.value : '';
 
     if (!waitStartTime) {
@@ -180,59 +182,49 @@ function startRide() {
     const waitTimeMin = waitTimeMs / 60000;
     waitCost = waitTimeMin > 15 ? (waitTimeMin - 15) * 0.50 : 0;
 
-    if (!navigator.geolocation) {
-        statusDiv.innerText = 'Geolocation not supported.';
-        console.log('Start Ride: Geolocation not supported');
+    statusDiv.innerText = waitCost > 0 
+        ? `Wait time cost: $${waitCost.toFixed(2)}. Ride started.`
+        : 'Ride started.';
+    startRideBtn.style.display = 'none';
+    finishRideBtn.style.display = 'block';
+    navOptions.style.display = 'flex';
+    startTime = new Date();
+    console.log('Start Ride: UI updated, navigation options shown');
+}
+
+function navigate(app) {
+    const destinationInput = document.getElementById('destination');
+    const destination = destinationInput ? destinationInput.value : '';
+
+    if (!destination) {
+        console.log('Navigate: No destination provided');
         return;
     }
 
-    statusDiv.innerText = waitCost > 0 
-        ? `Wait time cost: $${waitCost.toFixed(2)}. Starting ride...`
-        : 'No wait time cost. Starting ride...';
-    console.log('Start Ride: Fetching current location...');
-
-    new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-            maximumAge: 0,
-            timeout: 10000,
-            enableHighAccuracy: true
-        });
-    }).then(position => {
+    navigator.geolocation.getCurrentPosition(position => {
         const currentLocation = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
         };
-        console.log('Start Ride: Geolocation success - Current Location:', currentLocation);
+        console.log('Navigate: Current Location:', currentLocation);
 
-        const request = {
-            origin: new google.maps.LatLng(currentLocation.lat, currentLocation.lng),
-            destination: destination,
-            travelMode: 'DRIVING'
-        };
-        console.log('Start Ride: Routing request:', request);
+        const origin = `${currentLocation.lat},${currentLocation.lng}`;
+        const encodedDest = encodeURIComponent(destination);
 
-        return new Promise((resolveRoute, rejectRoute) => {
-            directionsService.route(request, (result, status) => {
-                console.log('Start Ride: Directions API response - Status:', status, 'Result:', result);
-                if (status === 'OK') {
-                    directionsRenderer.setDirections(result);
-                    resolveRoute();
-                } else {
-                    rejectRoute(new Error('Directions API failed: ' + status));
-                }
-            });
-        });
-    }).then(() => {
-        statusDiv.innerText = waitCost > 0 
-            ? `Wait time cost: $${waitCost.toFixed(2)}. Ride started, route updated.`
-            : 'Ride started, route updated.';
-        startRideBtn.style.display = 'none';
-        finishRideBtn.style.display = 'block';
-        startTime = new Date();
-        console.log('Start Ride: Route updated, UI transitioned to finishRideBtn');
-    }).catch(error => {
-        console.error('Start Ride: Error:', error.message);
-        statusDiv.innerText = `Failed: ${error.message}`;
+        if (app === 'google') {
+            window.location.href = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${encodedDest}&travelmode=driving`;
+            console.log('Navigate: Opening Google Maps');
+        } else if (app === 'apple') {
+            window.location.href = `maps://?saddr=${origin}&daddr=${encodedDest}&dirflg=d`;
+            console.log('Navigate: Opening Apple Maps');
+        }
+    }, error => {
+        console.error('Navigate: Geolocation error:', error.message, 'Code:', error.code);
+        document.getElementById('status').innerText = `Navigation failed: ${error.message}`;
+    }, {
+        maximumAge: 0,
+        timeout: 10000,
+        enableHighAccuracy: true
     });
 }
 
@@ -633,7 +625,6 @@ function updateTipButtonStyles() {
 // Finalize payment, save history, send admin email, reset
 async function finishPayment() {
     const amountInput = document.getElementById('amount');
-    const noteInput = document.getElementById('note');
     const driverNameInput = document.getElementById('driverName');
     const driverEmailInput = document.getElementById('driverEmail');
     const statusDiv = document.getElementById('status');
@@ -645,10 +636,8 @@ async function finishPayment() {
     const amount = parseFloat(amountInput.value);
     const driverName = driverNameInput.value;
     const driverEmail = driverEmailInput.value;
-    const note = noteInput.value || 'Ride Payment';
     const baseFare = window.baseAmount;
     const tipAmount = (amount - baseFare).toFixed(2);
-    const fullNote = tipAmount > 0 ? `Driver: ${driverName} - ${note} + Tip: $${tipAmount}` : `Driver: ${driverName} - ${note}`;
     const driverPay = (baseFare * 0.72 + parseFloat(tipAmount)).toFixed(2);
 
     statusDiv.innerText = 'Processing total payment...';
@@ -691,7 +680,6 @@ async function finishPayment() {
         fare: window.baseAmount.toFixed(2),
         tip: tipAmount,
         total: amount.toFixed(2),
-        note: note,
         driverPay: driverPay,
         startAddress: document.getElementById('startAddress').value,
         destination: document.getElementById('destination').value,
@@ -700,8 +688,10 @@ async function finishPayment() {
             new google.maps.LatLng(endLocation.lat, endLocation.lng)
         ) / 1609.34).toFixed(1) : 'N/A'),
         time: ((endTime && startTime) ? ((endTime - startTime) / 60000).toFixed(1) : 'N/A'),
-        waitCost: waitCost.toFixed(2) // Add this line
+        waitCost: waitCost.toFixed(2)
     };
+    // ... rest of finishPayment (email sending, etc.) ...
+    
     let history = JSON.parse(localStorage.getItem('rideHistory') || '[]');
     history.push(ride);
     localStorage.setItem('rideHistory', JSON.stringify(history));

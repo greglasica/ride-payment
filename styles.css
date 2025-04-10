@@ -410,6 +410,46 @@ input[type="text"], input[type="tel"] {
     background-color: #28A745;
 }
 
+#navOptions {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+#googleNavBtn, #appleNavBtn {
+    width: 48%;
+    padding: 12px;
+    background-color: #28A745; /* Green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#googleNavBtn:hover, #appleNavBtn:hover {
+    background-color: #218838; /* Darker green */
+}
+
+.google-logo {
+    width: 20px;
+    height: 20px;
+    background: url('https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png') no-repeat center;
+    background-size: contain;
+    margin-right: 8px;
+}
+
+.apple-logo {
+    width: 20px;
+    height: 20px;
+    background: url('https://www.apple.com/ac/structured-data/images/knowledge_graph_logo.png') no-repeat center;
+    background-size: contain;
+    margin-right: 8px;
+}
+
 #rideDetails {
     transition: all 0.3s ease; /* Smooth collapse/expand */
 }
