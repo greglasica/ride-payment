@@ -83,11 +83,19 @@
             <button id="back-to-charge" class="back-btn" type="button">← Back</button>
             <div id="payment-status"></div>
         </div>
+
+        <div id="venmoScreen" style="display: none;">
+            <h2>Pay with Venmo</h2>
+            <img src="/public/venmo-qr.jpg" alt="Venmo QR Code" id="venmoQrCode">
+            <button id="back-to-options" class="back-btn" onclick="backToPaymentOptions()">← Back</button>
+            <button id="finishVenmoBtn" onclick="finishVenmoPayment()">Finish Payment</button>
+        </div>
         
         <div id="paymentOptionsScreen" style="display: none;">
             <h2>Select Payment Method</h2>
             <button id="manualBtn" onclick="manualPayment()">Manual Enter Credit Card</button>
             <button id="tapBtn" onclick="tapPayment()">Tap-to-Pay</button>
+            <button id="venmoBtn" onclick="venmoPayment()">Venmo</button>
         </div>
 
         <div id="receiptScreen" class="receipt" style="display: none;">
