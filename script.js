@@ -565,6 +565,63 @@ function tapPayment() {
     document.getElementById('driverInfo').innerText = `Driver: ${driverName}`;
     document.getElementById('rideInfo').innerText = `Amount: $${window.baseAmount.toFixed(2)} - ${window.paymentNote}`;
 }
+
+function venmoPayment() {
+    console.log('Venmo payment selected');
+    const paymentOptionsScreen = document.getElementById('paymentOptionsScreen');
+    const venmoScreen = document.getElementById('venmoScreen');
+    const statusDiv = document.getElementById('status');
+
+    if (!venmoScreen) {
+        console.error('Venmo screen not found in DOM');
+        statusDiv.innerText = 'Error: Venmo screen not available';
+        return;
+    }
+
+    paymentOptionsScreen.style.display = 'none';
+    venmoScreen.style.display = 'block';
+    statusDiv.innerText = 'Scan the Venmo QR code to pay, then click Finish Payment';
+    console.log('Venmo screen displayed');
+
+    // Check if image loads
+    const qrImage = document.getElementById('venmoQrCode');
+    qrImage.onerror = () => {
+        console.error('Venmo QR image failed to load');
+        statusDiv.innerText = 'Error: Venmo QR code image not found';
+    };
+    qrImage.onload = () => {
+        console.log('Venmo QR image loaded successfully');
+    };
+}
+
+function backToPaymentOptions() {
+    const venmoScreen = document.getElementById('venmoScreen');
+    const paymentOptionsScreen = document.getElementById('paymentOptionsScreen');
+    const statusDiv = document.getElementById('status');
+
+    venmoScreen.style.display = 'none';
+    paymentOptionsScreen.style.display = 'block';
+    statusDiv.innerText = 'Choose payment method';
+}
+
+function finishVenmoPayment() {
+    const venmoScreen = document.getElementById('venmoScreen');
+    const receiptScreen = document.getElementById('receiptScreen');
+    const statusDiv = document.getElementById('status');
+    const driverName = document.getElementById('driverName').value;
+    const amountInput = document.getElementById('amount');
+    const amount = parseFloat(amountInput.value);
+
+    venmoScreen.style.display = 'none';
+    receiptScreen.style.display = 'block';
+    statusDiv.innerText = 'Venmo payment processed (mocked for web)';
+    console.log('Venmo payment mocked - awaiting verification');
+    setTipLabels(window.baseAmount);
+    updateTipButtonStyles();
+    document.getElementById('driverInfo').innerText = `Driver: ${driverName}`;
+    document.getElementById('rideInfo').innerText = `Amount: $${amount.toFixed(2)}`;
+}
+
 // Set amount from price buttons
 function setAmount(price) {
     const amountInput = document.getElementById('amount');
