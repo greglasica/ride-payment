@@ -334,14 +334,18 @@ function manualPayment() {
 function tapPayment() {
     console.log('Tap-to-pay selected');
     const paymentOptionsScreen = document.getElementById('paymentOptionsScreen');
-    const chargeScreen = document.getElementById('chargeScreen');
+    const receiptScreen = document.getElementById('receiptScreen');
     const statusDiv = document.getElementById('status');
+    const driverName = document.getElementById('driverName').value;
 
     paymentOptionsScreen.style.display = 'none';
-    chargeScreen.style.display = 'block';
-    statusDiv.innerText = 'Select amount for tap-to-pay';
+    receiptScreen.style.display = 'block';
+    statusDiv.innerText = 'Tap-to-pay processed (mocked for web)';
+    console.log('Tap-to-pay mocked - awaiting iOS implementation');
+    setTipLabels(window.baseAmount); // Already here
+    document.getElementById('driverInfo').innerText = `Driver: ${driverName}`;
+    document.getElementById('rideInfo').innerText = `Amount: $${window.baseAmount.toFixed(2)} - ${window.paymentNote}`;
 }
-
 // Set amount from price buttons
 function setAmount(price) {
     const amountInput = document.getElementById('amount');
@@ -380,11 +384,12 @@ function triggerPayment() {
     }
 
     console.log('Showing payment options with amount:', amount);
-    window.baseAmount = parseFloat(amount); // Ensure baseAmount is always a valid number
+    window.baseAmount = parseFloat(amount);
     window.paymentNote = note;
     chargeScreen.style.display = 'none';
     paymentOptionsScreen.style.display = 'block';
     statusDiv.innerText = 'Choose payment method';
+    setTipLabels(window.baseAmount); // Add here for preview
 }
 
 // Manual credit card payment
@@ -405,18 +410,13 @@ async function manualPayment() {
         if (!squarePayments) {
             throw new Error('Square payments not initialized');
         }
-
-        // Destroy existing card instance if it exists
         if (window.card) {
             console.log('Destroying previous card instance');
             await window.card.destroy();
             window.card = null;
         }
-
-        // Clear the card container to remove old form
         console.log('Clearing card container');
         cardContainer.innerHTML = '';
-
         console.log('Creating new Square card instance');
         window.card = await squarePayments.card();
         console.log('Attaching card form to #card-container');
@@ -428,6 +428,7 @@ async function manualPayment() {
             manualCardScreen.style.display = 'none';
             receiptScreen.style.display = 'block';
             statusDiv.innerText = 'Add tip to complete payment';
+            setTipLabels(window.baseAmount); // Ensure tip labels show
         };
     } catch (error) {
         console.error('Card initialization error:', error.message || error);
