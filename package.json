@@ -1,0 +1,28 @@
+{
+  "name": "ride-payment",
+  "version": "1.0.0",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/greglasica/ride-payment.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/greglasica/ride-payment/issues"
+  },
+  "homepage": "https://github.com/greglasica/ride-payment#readme",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.13",
+    "square": "^37.0.0",
+    "twilio": "^5.0.4"
+  }
+}

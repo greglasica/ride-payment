@@ -1,6 +1,8 @@
 let map, directionsService, directionsRenderer;
 let startLocation, endLocation, startTime, endTime;
 let squarePayments;
+let waitStartTime;
+let waitCost = 0;
 
 // Helper function to set tip labels
 function setTipLabels(baseAmount) {
@@ -124,15 +126,33 @@ function arrive() {
                 lng: position.coords.longitude
             };
             map.setCenter(startLocation);
-            document.getElementById('status').innerText = 'Arrived at pickup.';
+            document.getElementById('status').innerText = 'Arrived at pickup. Waiting...';
             document.getElementById('arriveBtn').style.display = 'none';
-            document.getElementById('finishRideBtn').style.display = 'block';
+            document.getElementById('startRideBtn').style.display = 'block'; // Show Start Ride
+            waitStartTime = new Date(); // Start wait clock
         }, () => {
             document.getElementById('status').innerText = 'Geolocation failed.';
         });
     } else {
         document.getElementById('status').innerText = 'Geolocation not supported.';
     }
+}
+
+function startRide() {
+    if (!waitStartTime) {
+        document.getElementById('status').innerText = 'Wait time not started.';
+        return;
+    }
+    const waitEndTime = new Date();
+    const waitTimeMs = waitEndTime - waitStartTime; // Wait time in milliseconds
+    const waitTimeMin = waitTimeMs / 60000; // Convert to minutes
+    waitCost = waitTimeMin > 15 ? (waitTimeMin - 15) * 0.50 : 0; // $0.50/min after 15 min
+    document.getElementById('status').innerText = waitCost > 0 
+        ? `Wait time cost: $${waitCost.toFixed(2)}. Starting ride...`
+        : 'No wait time cost. Starting ride...';
+    document.getElementById('startRideBtn').style.display = 'none';
+    document.getElementById('finishRideBtn').style.display = 'block';
+    startTime = new Date(); // Reset startTime for ride duration
 }
 
 // Finish the ride at destination
@@ -167,6 +187,7 @@ function finishRide() {
                     document.getElementById('paymentScreen').style.display = 'none';
                     document.getElementById('finishRideBtn').style.display = 'none';
                     document.getElementById('chargeScreen').style.display = 'block';
+                    window.baseAmount = waitCost > 0 ? waitCost : 0; // Initial base includes wait cost
                 } else {
                     document.getElementById('status').innerText = 'Failed to calculate route.';
                     console.log('Route failed:', status);
@@ -517,7 +538,8 @@ async function finishPayment() {
             new google.maps.LatLng(startLocation.lat, startLocation.lng),
             new google.maps.LatLng(endLocation.lat, endLocation.lng)
         ) / 1609.34).toFixed(1) : 'N/A'),
-        time: ((endTime && startTime) ? ((endTime - startTime) / 60000).toFixed(1) : 'N/A')
+        time: ((endTime && startTime) ? ((endTime - startTime) / 60000).toFixed(1) : 'N/A'),
+        waitCost: waitCost.toFixed(2) // Add this line
     };
     let history = JSON.parse(localStorage.getItem('rideHistory') || '[]');
     history.push(ride);
@@ -543,6 +565,7 @@ Ride Breakdown:
 - Distance: ${distance} mi ($1.60/mi = $${(distance * 1.60).toFixed(2)})
 - Time: ${time} min ($0.41/min = $${(time * 0.41).toFixed(2)})
 - Fixed Fare Total: $${fixedFare}
+- Wait Cost: $${ride.waitCost}
 - Actual Amount Charged: $${chargedAmount}
 - Driver Pay: $${driverPay} (72% Fare + 100% Tip)
 - Note: ${note}
