@@ -19,13 +19,13 @@
                 </div>
             </div>
             <h2>Ride Payment</h2>
-            <button id="toggleDetailsBtn" onclick="toggleRideDetails()">Show Ride Details</button>
-            <div id="rideDetails" style="display: block;">
-                <input type="text" id="startAddress" placeholder="Start Address">
-                <input type="text" id="destination" placeholder="Destination">
-                <input type="tel" id="clientPhone" placeholder="Client Phone (e.g., 12345678900)" required>
-            </div>
-            <button id="onOurWayBtn" onclick="onOurWay()">On Our Way</button>
+    <button id="toggleDetailsBtn" onclick="toggleRideDetails()" style="display: none;">Show Ride Details</button>
+    <div id="rideDetails" style="display: block;">
+        <input type="text" id="startAddress" placeholder="Start Address">
+        <input type="text" id="destination" placeholder="Destination">
+        <input type="tel" id="clientPhone" placeholder="Client Phone (e.g., 12345678900)" required>
+    </div>
+    <button id="onOurWayBtn" onclick="onOurWay()">On Our Way</button>
             <button id="arriveBtn" onclick="arrive()" style="display: none;">Arrive</button>
             <button id="startRideBtn" onclick="startRide()" style="display: none;">Start Ride</button>
             <button id="finishRideBtn" onclick="finishRide()" style="display: none;">Finish Ride</button>

@@ -85,6 +85,7 @@ function onOurWay() {
                     document.getElementById('onOurWayBtn').style.display = 'none';
                     document.getElementById('arriveBtn').style.display = 'block';
                     document.getElementById('rideDetails').style.display = 'none';
+                    document.getElementById('toggleDetailsBtn').style.display = 'block'; // Show toggle button
                     document.getElementById('toggleDetailsBtn').innerText = 'Show Ride Details';
                     document.getElementById('map').style.height = '400px';
                 } else {
