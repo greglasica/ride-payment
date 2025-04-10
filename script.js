@@ -943,147 +943,133 @@ async function finishPayment() {
         }
         console.log('Tokenizing total payment (base + tip): $' + amount);
         const result = await window.card.tokenize();
-        if (result.status === 'OK') {
-            const token = result.token;
-            console.log('Total payment token:', token);
-            window.paymentToken = token;
-            statusDiv.innerText = 'Payment processed!';
-            statusDiv.className = 'success';
-        } else {
-            statusDiv.innerText = 'Payment failed: ' + (result.errors?.[0]?.message || 'Unknown error');
-            statusDiv.className = 'error';
-            document.getElementById('back-to-card').onclick = () => {
-                receiptScreen.style.display = 'none';
-                manualCardScreen.style.display = 'block';
-                statusDiv.innerText = 'Re-enter card details';
-            };
-            return;
+        if (result.status !== 'OK') {
+            throw new Error(result.errors?.[0]?.message || 'Tokenization failed');
         }
+        const token = result.token;
+        console.log('Total payment token:', token);
+        window.paymentToken = token;
+
+        const chargeResponse = await fetch('/charge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token, amount })
+        });
+        if (!chargeResponse.ok) {
+            throw new Error(`Charge failed: ${chargeResponse.statusText}`);
+        }
+        const chargeResult = await chargeResponse.json();
+        if (chargeResult.status !== 'success') {
+            throw new Error(chargeResult.message || 'Payment failed on server');
+        }
+        statusDiv.innerText = 'Payment processed! Payment ID: ' + chargeResult.paymentId;
+        statusDiv.className = 'success';
+
+        const ride = {
+            dateTime: new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }),
+            fare: baseFare.toFixed(2),
+            tip: tipAmount,
+            total: amount.toFixed(2),
+            driverPay: driverPay,
+            startAddress: document.getElementById('startAddress').value,
+            destination: document.getElementById('destination').value,
+            distance: ((endLocation && startLocation) ? (google.maps.geometry.spherical.computeDistanceBetween(
+                new google.maps.LatLng(startLocation.lat, startLocation.lng),
+                new google.maps.LatLng(endLocation.lat, endLocation.lng)
+            ) / 1609.34).toFixed(1) : 'N/A'),
+            time: ((endTime && startTime) ? ((endTime - startTime) / 60000).toFixed(1) : 'N/A'),
+            waitCost: waitCost.toFixed(2)
+        };
+        let history = JSON.parse(localStorage.getItem('rideHistory') || '[]');
+        history.push(ride);
+        localStorage.setItem('rideHistory', JSON.stringify(history));
+
+        const dateTime = ride.dateTime;
+        const distance = ride.distance;
+        const time = ride.time;
+        const fixedFare = (distance * 1.60 + time * 0.41).toFixed(2);
+        const chargedAmount = amount.toFixed(2);
+
+        const adminSubject = `MinnDrive Ride Review - ${dateTime}`;
+        const adminBody = `
+        MinnDrive Ride Review
+        Driver: ${driverName}
+        Start Address: ${ride.startAddress}
+        Destination: ${ride.destination}
+        Date/Time: ${dateTime}
+        Ride Breakdown:
+        - Distance: ${distance} mi ($1.60/mi = $${(distance * 1.60).toFixed(2)})
+        - Time: ${time} min ($0.41/min = $${(time * 0.41).toFixed(2)})
+        - Fixed Fare Total: $${fixedFare}
+        - Wait Cost: $${ride.waitCost}
+        - Actual Amount Charged: $${chargedAmount}
+        - Driver Pay: $${driverPay} (72% Fare + 100% Tip)
+        `.trim();
+
+        const driverSubject = `MinnDrive Receipt - ${dateTime}`;
+        const driverBody = `
+        MinnDrive Receipt
+        3333 Lake Shore Ct, Chaska, MN 55318
+        Date/Time: ${dateTime}
+        Driver: ${driverName}
+        Ride Details:
+        - Start: ${ride.startAddress}
+        - Destination: ${ride.destination}
+        - Fare: $${baseFare.toFixed(2)}
+        - Wait Cost: $${ride.waitCost}
+        - Tip: $${tipAmount}
+        - Total: $${chargedAmount}
+        Thank you for choosing MinnDrive!
+        `.trim();
+
+        await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                adminSubject,
+                adminBody,
+                driverSubject,
+                driverBody,
+                driverEmail
+            })
+        }).then(response => response.json())
+          .then(data => {
+              if (data.status === 'success') {
+                  console.log('Emails sent successfully');
+              } else {
+                  console.error('Email send failed:', data.message);
+              }
+          });
+
+        statusDiv.innerText = 'Payment Successful! Total: $' + chargedAmount;
+        statusDiv.className = 'success';
+
+        setTimeout(() => {
+            console.log('Resetting UI to paymentScreen');
+            paymentScreen.style.display = 'block';
+            chargeScreen.style.display = 'none';
+            receiptScreen.style.display = 'none';
+            manualCardScreen.style.display = 'none';
+            paymentOptionsScreen.style.display = 'none';
+            amountInput.value = '';
+            document.getElementById('startAddress').value = '';
+            document.getElementById('destination').value = '';
+            document.getElementById('clientPhone').value = '';
+            document.getElementById('onOurWayBtn').style.display = 'block';
+            document.getElementById('arriveBtn').style.display = 'none';
+            document.getElementById('startRideBtn').style.display = 'none';
+            document.getElementById('finishRideBtn').style.display = 'none';
+            document.getElementById('navOptions').style.display = 'none';
+            map.setCenter({ lat: 44.8549, lng: -93.4708 });
+            directionsRenderer.set('directions', null);
+            statusDiv.innerText = '';
+            console.log('UI reset complete');
+        }, 10000);
     } catch (error) {
         console.error('Payment error:', error.message || error);
         statusDiv.innerText = 'Payment error: ' + (error.message || 'Unknown error');
         statusDiv.className = 'error';
-        document.getElementById('back-to-card').onclick = () => {
-            receiptScreen.style.display = 'none';
-            manualCardScreen.style.display = 'block';
-            statusDiv.innerText = 'Re-enter card details';
-        };
-        return;
     }
-
-    const ride = {
-        dateTime: new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }),
-        fare: window.baseAmount.toFixed(2),
-        tip: tipAmount,
-        total: amount.toFixed(2),
-        driverPay: driverPay,
-        startAddress: document.getElementById('startAddress').value,
-        destination: document.getElementById('destination').value,
-        distance: ((endLocation && startLocation) ? (google.maps.geometry.spherical.computeDistanceBetween(
-            new google.maps.LatLng(startLocation.lat, startLocation.lng),
-            new google.maps.LatLng(endLocation.lat, endLocation.lng)
-        ) / 1609.34).toFixed(1) : 'N/A'),
-        time: ((endTime && startTime) ? ((endTime - startTime) / 60000).toFixed(1) : 'N/A'),
-        waitCost: waitCost.toFixed(2)
-    };
-    let history = JSON.parse(localStorage.getItem('rideHistory') || '[]');
-    history.push(ride);
-    localStorage.setItem('rideHistory', JSON.stringify(history));
-
-    const dateTime = ride.dateTime;
-    const distance = ride.distance;
-    const time = ride.time;
-    const fixedFare = (distance * 1.60 + time * 0.41).toFixed(2);
-    const chargedAmount = amount.toFixed(2);
-
-    // Email content without note
-    const adminSubject = `MinnDrive Ride Review - ${dateTime}`;
-    const adminBody = `
-MinnDrive Ride Review
-Driver: ${driverName}
-Start Address: ${ride.startAddress}
-Destination: ${ride.destination}
-Date/Time: ${dateTime}
-
-Ride Breakdown:
-- Distance: ${distance} mi ($1.60/mi = $${(distance * 1.60).toFixed(2)})
-- Time: ${time} min ($0.41/min = $${(time * 0.41).toFixed(2)})
-- Fixed Fare Total: $${fixedFare}
-- Wait Cost: $${ride.waitCost}
-- Actual Amount Charged: $${chargedAmount}
-- Driver Pay: $${driverPay} (72% Fare + 100% Tip)
-- Note: ${note}
-`.trim();
-
-const driverSubject = `MinnDrive Receipt - ${dateTime}`;
-const driverBody = `
-MinnDrive Receipt
-3333 Lake Shore Ct, Chaska, MN 55318
-Date/Time: ${dateTime}
-Driver: ${driverName}
-
-Ride Details:
-- Start: ${ride.startAddress}
-- Destination: ${ride.destination}
-- Fare: $${baseFare.toFixed(2)}
-- Wait Cost: $${ride.waitCost}
-- Tip: $${tipAmount}
-- Total: $${chargedAmount}
-
-Thank you for choosing MinnDrive!
-`.trim();
-
-// Send emails in background
-await fetch('/api/send-email', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        adminSubject,
-        adminBody,
-        driverSubject,
-        driverBody,
-        driverEmail
-    })
-})
-.then(response => response.json())
-.then(data => {
-    if (data.status === 'success') {
-        console.log('Emails sent successfully');
-    } else {
-        console.error('Email send failed:', data.message);
-        statusDiv.innerText = 'Email send failed: ' + data.message;
-        statusDiv.className = 'error';
-    }
-})
-.catch(error => {
-    console.error('Email send error:', error);
-    statusDiv.innerText = 'Email send error: ' + error.message;
-    statusDiv.className = 'error';
-});
-
-    statusDiv.innerText = 'Payment Successful! Total: $' + chargedAmount;
-    statusDiv.className = 'success';
-
-    // Reset UI after 10 seconds
-    setTimeout(() => {
-        console.log('Resetting UI to paymentScreen');
-        paymentScreen.style.display = 'block';
-        chargeScreen.style.display = 'none';
-        receiptScreen.style.display = 'none';
-        manualCardScreen.style.display = 'none';
-        paymentOptionsScreen.style.display = 'none';
-        amountInput.value = '';
-        document.getElementById('startAddress').value = '';
-        document.getElementById('destination').value = '';
-        document.getElementById('clientPhone').value = '';
-        document.getElementById('onOurWayBtn').style.display = 'block';
-        document.getElementById('arriveBtn').style.display = 'none';
-        document.getElementById('finishRideBtn').style.display = 'none';
-        map.setCenter({ lat: 44.8549, lng: -93.4708 });
-        directionsRenderer.set('directions', null);
-        statusDiv.innerText = '';
-        console.log('UI reset complete');
-    }, 10000); // 10 seconds delay
 }
 
 function toggleMenu(event) {

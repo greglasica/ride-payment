@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const twilio = require('twilio');
-const { Client, Environment } = require('square'); // Keep this for now
+const { Client, Environment } = require('square');
 const nodemailer = require('nodemailer');
 const path = require('path');
 const app = express();
@@ -28,7 +28,7 @@ const twilioClient = new twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN
 const twilioNumber = process.env.TWILIO_NUMBER;
 const squareClient = new Client({
     accessToken: process.env.SQUARE_ACCESS_TOKEN,
-    environment: Environment.Production // Changed to Production
+    environment: Environment.Production
 });
 
 const transporter = nodemailer.createTransport({
@@ -59,43 +59,44 @@ app.post('/api/send-sms', (req, res) => {
     });
 });
 
-app.post('/charge', async (req, res) => { // Changed to /charge
+app.post('/charge', async (req, res) => {
     const { token, amount } = req.body;
+    if (!token || !amount) {
+        console.error('Missing token or amount in /charge request');
+        return res.status(400).json({ status: 'error', message: 'Missing token or amount' });
+    }
     try {
         const response = await squareClient.paymentsApi.createPayment({
             sourceId: token,
             amountMoney: {
-                amount: Math.round(amount * 100), // Dollars to cents
+                amount: Math.round(amount * 100), // Convert dollars to cents
                 currency: 'USD'
             },
             idempotencyKey: `${Date.now()}-${Math.random().toString(36).substring(2)}`,
-            locationId: process.env.SQUARE_LOCATION_ID // Use env directly
+            locationId: process.env.SQUARE_LOCATION_ID
         });
         console.log('Payment successful:', response.result.payment.id);
         res.json({ status: 'success', paymentId: response.result.payment.id });
     } catch (error) {
-        console.error('Payment error:', error.message, error.errors);
+        console.error('Payment error:', error.message, error.errors ? error.errors : 'No additional details');
         res.status(500).json({ status: 'error', message: error.message || 'Payment failed' });
     }
 });
 
 app.post('/api/send-email', async (req, res) => {
     const { adminSubject, adminBody, driverSubject, driverBody, driverEmail } = req.body;
-
     const adminMailOptions = {
         from: process.env.EMAIL_USER,
         to: 'minndriveairport@gmail.com',
         subject: adminSubject,
         text: adminBody
     };
-
     const driverMailOptions = {
         from: process.env.EMAIL_USER,
         to: driverEmail,
         subject: driverSubject,
         text: driverBody
     };
-
     try {
         await transporter.sendMail(adminMailOptions);
         console.log('Admin email sent');
