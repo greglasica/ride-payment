@@ -145,18 +145,60 @@ input[type="text"], input[type="tel"] {
     background-color: #e05500;
 }
 
-#chargeBtn {
+#chargeScreen {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+#chargeButtons, #moreChargeButtons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.charge-btn {
+    width: 48%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 5px 0;
+    cursor: pointer;
+    color: white;
+}
+
+/* Alternating colors: Light Blue (#4A90E2) and Soft Purple (#9B59B6) */
+#chargeButtons .charge-btn:nth-child(odd),
+#moreChargeButtons .charge-btn:nth-child(odd) {
+    background-color: #4A90E2; /* Light Blue */
+}
+
+#chargeButtons .charge-btn:nth-child(even),
+#moreChargeButtons .charge-btn:nth-child(even) {
+    background-color: #9B59B6; /* Soft Purple */
+}
+
+.charge-btn:hover {
+    opacity: 0.9;
+}
+
+#moreChargeBtn {
     width: 100%;
     padding: 12px;
-    background-color: #28a745;
+    background-color: #000000; /* Black */
     color: white;
     border: none;
     border-radius: 5px;
     font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
 }
 
-#chargeBtn:hover {
-    background-color: #218838;
+#moreChargeBtn:hover {
+    background-color: #333333; /* Darker gray for hover */
 }
 
 .receipt {

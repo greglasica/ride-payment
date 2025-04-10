@@ -41,39 +41,44 @@
    
 
         <div id="chargeScreen" style="display: none;">
-            <h2>Charge Ride Amount</h2>
-            <div id="price-grid">
-                <button class="price-btn" onclick="setAmount('variable')">Variable</button>
-                <button class="price-btn" onclick="setAmount(35)">$35</button>
-                <button class="price-btn" onclick="setAmount(40)">$40</button>
-                <button class="common-price-btn" onclick="setAmount(45)">$45</button>
-                <button class="common-price-btn" onclick="setAmount(50)">$50</button>
-                <button class="common-price-btn" onclick="setAmount(55)">$55</button>
-                <button class="common-price-btn" onclick="setAmount(60)">$60</button>
-                <button class="common-price-btn" onclick="setAmount(65)">$65</button>
-                <button class="common-price-btn" onclick="setAmount(70)">$70</button>
-                <button class="common-price-btn" onclick="setAmount(75)">$75</button>
-                <button class="price-btn" onclick="setAmount(80)">$80</button>
-                <button class="price-btn" onclick="setAmount(85)">$85</button>
-                <button class="price-btn" onclick="setAmount(90)">$90</button>
-                <button class="price-btn" onclick="setAmount(95)">$95</button>
-                <button class="price-btn" onclick="setAmount(100)">$100</button>
-                <button class="price-btn" onclick="setAmount(105)">$105</button>
-                <button class="price-btn" onclick="setAmount(110)">$110</button>
-                <button class="price-btn" onclick="setAmount(115)">$115</button>
-                <button class="price-btn" onclick="setAmount(120)">$120</button>
-                <button class="price-btn" onclick="setAmount(125)">$125</button>
-                <button class="price-btn" onclick="setAmount(130)">$130</button>
-                <button class="price-btn" onclick="setAmount(135)">$135</button>
-                <button class="price-btn" onclick="setAmount(140)">$140</button>
-                <button class="price-btn" onclick="setAmount(145)">$145</button>
-                <button class="price-btn" onclick="setAmount(150)">$150</button>
+            <h2>Payment Amount</h2>
+            <input type="number" id="amount" step="0.01" placeholder="Amount ($)">
+            <div id="chargeButtons">
+                <button class="charge-btn" onclick="setAmount(5)">$5</button>
+                <button class="charge-btn" onclick="setAmount(10)">$10</button>
+                <button class="charge-btn" onclick="setAmount(15)">$15</button>
+                <button class="charge-btn" onclick="setAmount(20)">$20</button>
+                <button class="charge-btn" onclick="setAmount(25)">$25</button>
+                <button class="charge-btn" onclick="setAmount(30)">$30</button>
+                <button class="charge-btn" onclick="setAmount(35)">$35</button>
+                <button class="charge-btn" onclick="setAmount(40)">$40</button>
+                <button class="charge-btn" onclick="setAmount(45)">$45</button>
+                <button class="charge-btn" onclick="setAmount(50)">$50</button>
+                <button class="charge-btn" onclick="setAmount(55)">$55</button>
+                <button class="charge-btn" onclick="setAmount(60)">$60</button>
+                <button class="charge-btn" onclick="setAmount(65)">$65</button>
+                <button class="charge-btn" onclick="setAmount(70)">$70</button>
+                <button class="charge-btn" onclick="setAmount(75)">$75</button>
+                <button class="charge-btn" onclick="setAmount(80)">$80</button>
+                <button class="charge-btn" onclick="setAmount(85)">$85</button>
+                <button class="charge-btn" onclick="setAmount(90)">$90</button>
+                <button class="charge-btn" onclick="setAmount(95)">$95</button>
             </div>
-            <button id="chargeBtn" onclick="triggerPayment()" style="display: block;">Pay Now</button>
-        </div>
-        
-        <div id="paymentOptionsScreen" style="display: none;">
-            <h2>Select Payment Method</h2>
+            <button id="moreChargeBtn" onclick="showMoreCharges()">More</button>
+            <div id="moreChargeButtons" style="display: none;">
+                <button class="charge-btn" onclick="setAmount(100)">$100</button>
+                <button class="charge-btn" onclick="setAmount(105)">$105</button>
+                <button class="charge-btn" onclick="setAmount(110)">$110</button>
+                <button class="charge-btn" onclick="setAmount(115)">$115</button>
+                <button class="charge-btn" onclick="setAmount(120)">$120</button>
+                <button class="charge-btn" onclick="setAmount(125)">$125</button>
+                <button class="charge-btn" onclick="setAmount(130)">$130</button>
+                <button class="charge-btn" onclick="setAmount(135)">$135</button>
+                <button class="charge-btn" onclick="setAmount(140)">$140</button>
+                <button class="charge-btn" onclick="setAmount(145)">$145</button>
+                <button class="charge-btn" onclick="setAmount(150)">$150</button>
+            </div>
+            <button id="chargeBtn" onclick="triggerPayment()">Pay Now</button>
             <button id="manualBtn" onclick="manualPayment()">Manual Enter Credit Card</button>
             <button id="tapBtn" onclick="tapPayment()">Tap-to-Pay</button>
         </div>

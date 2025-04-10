@@ -610,6 +610,14 @@ function triggerPayment() {
     setTipLabels(window.baseAmount);
 }
 
+function showMoreCharges() {
+    const moreChargeButtons = document.getElementById('moreChargeButtons');
+    const moreChargeBtn = document.getElementById('moreChargeBtn');
+    moreChargeButtons.style.display = 'block';
+    moreChargeBtn.style.display = 'none';
+    console.log('More charge options shown');
+}
+
 // Manual credit card payment
 async function manualPayment() {
     console.log('Manual payment selected');
