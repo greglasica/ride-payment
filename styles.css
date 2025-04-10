@@ -322,7 +322,7 @@ input[type="text"], input[type="tel"] {
     background-color: #e9ecef;
 }
 
-#arriveBtn, #onOurWayBtn, #finishRideBtn {
+#arriveBtn, #onOurWayBtn, #startRideBtn, #finishRideBtn {
     width: 100%;
     padding: 12px;
     background-color: #007bff;
@@ -334,7 +334,7 @@ input[type="text"], input[type="tel"] {
     cursor: pointer;
 }
 
-#arriveBtn:hover, #onOurWayBtn:hover, #finishRideBtn:hover {
+#arriveBtn:hover, #onOurWayBtn:hover, #startRideBtn:hover, #finishRideBtn:hover {
     background-color: #0056b3;
 }
 
