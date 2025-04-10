@@ -44,12 +44,6 @@
             <h2>Payment Amount</h2>
             <input type="number" id="amount" step="0.01" placeholder="Amount ($)">
             <div id="chargeButtons">
-                <button class="charge-btn" onclick="setAmount(5)">$5</button>
-                <button class="charge-btn" onclick="setAmount(10)">$10</button>
-                <button class="charge-btn" onclick="setAmount(15)">$15</button>
-                <button class="charge-btn" onclick="setAmount(20)">$20</button>
-                <button class="charge-btn" onclick="setAmount(25)">$25</button>
-                <button class="charge-btn" onclick="setAmount(30)">$30</button>
                 <button class="charge-btn" onclick="setAmount(35)">$35</button>
                 <button class="charge-btn" onclick="setAmount(40)">$40</button>
                 <button class="charge-btn" onclick="setAmount(45)">$45</button>
@@ -78,9 +72,8 @@
                 <button class="charge-btn" onclick="setAmount(145)">$145</button>
                 <button class="charge-btn" onclick="setAmount(150)">$150</button>
             </div>
+            <button class="charge-btn" onclick="setAmount('variable')">Custom</button>
             <button id="chargeBtn" onclick="triggerPayment()">Pay Now</button>
-            <button id="manualBtn" onclick="manualPayment()">Manual Enter Credit Card</button>
-            <button id="tapBtn" onclick="tapPayment()">Tap-to-Pay</button>
         </div>
         
         <div id="manualCardScreen" style="display: none;">

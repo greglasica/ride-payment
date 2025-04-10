@@ -56,14 +56,20 @@ input[type="text"], input[type="tel"] {
 }
 
 /* New styles for payment options and manual card screens */
-#paymentOptionsScreen, #manualCardScreen {
-    text-align: center;
-    padding: 20px;
+#paymentOptionsScreen button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
 }
 
-#paymentOptionsScreen h2, #manualCardScreen h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
+#paymentOptionsScreen button:hover {
+    background-color: #0056b3;
 }
 
 #manualBtn, #tapBtn {
@@ -170,7 +176,6 @@ input[type="text"], input[type="tel"] {
     color: white;
 }
 
-/* Alternating colors: Light Blue (#4A90E2) and Soft Purple (#9B59B6) */
 #chargeButtons .charge-btn:nth-child(odd),
 #moreChargeButtons .charge-btn:nth-child(odd) {
     background-color: #4A90E2; /* Light Blue */
@@ -183,6 +188,38 @@ input[type="text"], input[type="tel"] {
 
 .charge-btn:hover {
     opacity: 0.9;
+}
+
+#moreChargeBtn {
+    width: 100%;
+    padding: 12px;
+    background-color: #000000; /* Black */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+#moreChargeBtn:hover {
+    background-color: #333333; /* Darker gray */
+}
+
+#chargeBtn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff; /* Match other action buttons */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+#chargeBtn:hover {
+    background-color: #0056b3;
 }
 
 #moreChargeBtn {
