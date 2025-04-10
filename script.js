@@ -755,7 +755,7 @@ async function finishPayment() {
 
     // Email content without note
     const adminSubject = `MinnDrive Ride Review - ${dateTime}`;
-    const adminBody = ``
+    const adminBody = `
 MinnDrive Ride Review
 Driver: ${driverName}
 Start Address: ${ride.startAddress}
