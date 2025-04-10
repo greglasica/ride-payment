@@ -44,11 +44,15 @@ function initAutocomplete() {
 function onOurWay() {
     const startAddress = document.getElementById('startAddress').value;
     const destination = document.getElementById('destination').value;
-    const clientPhone = document.getElementById('clientPhone').value;
+    const clientPhone = document.getElementById('clientPhone').value.trim();
     const driverName = document.getElementById('driverName').value;
 
     if (!startAddress || !destination || !clientPhone) {
         document.getElementById('status').innerText = 'Please enter start address, destination, and client phone.';
+        return;
+    }
+    if (!/^\d{10}$/.test(clientPhone.replace(/[^\d]/g, ''))) {
+        document.getElementById('status').innerText = 'Please enter a valid 10-digit phone number (e.g., 1234567890).';
         return;
     }
 
@@ -68,13 +72,10 @@ function onOurWay() {
             directionsService.route(request, (result, status) => {
                 if (status === 'OK') {
                     directionsRenderer.setDirections(result);
-                    const duration = result.routes[0].legs[0].duration.value / 60; // Minutes
+                    const duration = result.routes[0].legs[0].duration.value / 60;
                     const eta = new Date(startTime.getTime() + duration * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                    // Open iPhone Messages app with pre-filled SMS
                     const smsMessage = `Your driver, ${driverName}, is on the way from their location. Estimated ETA to your pickup: ${eta}`;
                     window.location.href = `sms:${clientPhone}&body=${encodeURIComponent(smsMessage)}`;
-
                     document.getElementById('status').innerText = `On our way to pickup. ETA: ${eta}`;
                     document.getElementById('onOurWayBtn').style.display = 'none';
                     document.getElementById('arriveBtn').style.display = 'block';
@@ -246,17 +247,35 @@ window.onload = function() {
 };
 
 // Update profile
-function updateProfile() {
+function showUpdateProfile() {
+    const updateProfileScreen = document.getElementById('updateProfileScreen');
+    const paymentScreen = document.getElementById('paymentScreen');
     const driverNameInput = document.getElementById('driverName');
     const driverEmailInput = document.getElementById('driverEmail');
-    if (!driverNameInput || !driverEmailInput) {
-        console.error('Profile inputs not found');
-        return;
-    }
 
-    const newName = prompt('Enter your name:', driverNameInput.value);
-    const newEmail = prompt('Enter your email:', driverEmailInput.value);
-    const newPhone = prompt('Enter your phone number:', localStorage.getItem('driverPhone') || '');
+    // Pre-fill fields with current values
+    document.getElementById('updateName').value = driverNameInput.value || localStorage.getItem('defaultDriver') || '';
+    document.getElementById('updateEmail').value = driverEmailInput.value || localStorage.getItem('driverEmail') || '';
+    document.getElementById('updatePhone').value = localStorage.getItem('driverPhone') || '';
+
+    paymentScreen.style.display = 'none';
+    updateProfileScreen.style.display = 'block';
+    document.getElementById('menuDropdown').style.display = 'none'; // Close menu
+}
+
+function hideUpdateProfile() {
+    const updateProfileScreen = document.getElementById('updateProfileScreen');
+    const paymentScreen = document.getElementById('paymentScreen');
+    updateProfileScreen.style.display = 'none';
+    paymentScreen.style.display = 'block';
+}
+
+function saveProfile() {
+    const newName = document.getElementById('updateName').value;
+    const newEmail = document.getElementById('updateEmail').value;
+    const newPhone = document.getElementById('updatePhone').value;
+    const driverNameInput = document.getElementById('driverName');
+    const driverEmailInput = document.getElementById('driverEmail');
 
     if (newName) {
         const formattedName = capitalizeName(newName);
@@ -270,7 +289,9 @@ function updateProfile() {
     if (newPhone) {
         localStorage.setItem('driverPhone', newPhone);
     }
+
     console.log('Profile updated:', { name: newName, email: newEmail, phone: newPhone });
+    hideUpdateProfile();
 }
 
 
