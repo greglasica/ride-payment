@@ -73,8 +73,10 @@
         
         <div id="manualCardScreen" style="display: none;">
             <h2>Enter Credit Card Details</h2>
+            <p>Ride Amount: $<span id="ride-amount">0.00</span></p>
             <div id="card-container"></div>
             <button id="card-button" type="button">Charge Card</button>
+            <button id="back-to-charge" type="button">Back</button>
             <div id="payment-status"></div>
         </div>
         
@@ -100,7 +102,9 @@
                 <button id="tipCustom" class="tip-btn" onclick="addTip('custom')">Custom</button>
             </div>
             <button id="finishBtn" onclick="finishPayment()">Finish</button>
+            <button id="back-to-card" type="button">Back</button>
         </div>
+
         <div id="historyModal" class="modal" style="display: none;">
             <div class="modal-content">
                 <span class="close" onclick="hideHistory()">&times;</span>

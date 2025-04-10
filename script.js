@@ -381,13 +381,16 @@ async function manualPayment() {
     const paymentOptionsScreen = document.getElementById('paymentOptionsScreen');
     const manualCardScreen = document.getElementById('manualCardScreen');
     const receiptScreen = document.getElementById('receiptScreen');
+    const chargeScreen = document.getElementById('chargeScreen');
     const statusDiv = document.getElementById('status');
     const driverName = document.getElementById('driverName').value;
     const cardContainer = document.getElementById('card-container');
 
     paymentOptionsScreen.style.display = 'none';
     manualCardScreen.style.display = 'block';
+    chargeScreen.style.display = 'none';
     statusDiv.innerText = 'Loading card form...';
+    document.getElementById('ride-amount').innerText = window.baseAmount.toFixed(2); // Show base amount
 
     try {
         if (!squarePayments) {
@@ -413,6 +416,13 @@ async function manualPayment() {
             statusDiv.innerText = 'Add tip to complete payment';
             setTipLabels(window.baseAmount);
             updateTipButtonStyles();
+        };
+
+        // Back to charge screen
+        document.getElementById('back-to-charge').onclick = () => {
+            manualCardScreen.style.display = 'none';
+            chargeScreen.style.display = 'block';
+            statusDiv.innerText = 'Select amount for manual card entry';
         };
     } catch (error) {
         console.error('Card initialization error:', error.message || error);
@@ -528,12 +538,22 @@ async function finishPayment() {
         } else {
             statusDiv.innerText = 'Payment failed: ' + (result.errors?.[0]?.message || 'Unknown error');
             statusDiv.className = 'error';
+            document.getElementById('back-to-card').onclick = () => {
+                receiptScreen.style.display = 'none';
+                manualCardScreen.style.display = 'block';
+                statusDiv.innerText = 'Re-enter card details';
+            };
             return;
         }
     } catch (error) {
         console.error('Payment error:', error.message || error);
         statusDiv.innerText = 'Payment error: ' + (error.message || 'Unknown error');
         statusDiv.className = 'error';
+        document.getElementById('back-to-card').onclick = () => {
+            receiptScreen.style.display = 'none';
+            manualCardScreen.style.display = 'block';
+            statusDiv.innerText = 'Re-enter card details';
+        };
         return;
     }
 
