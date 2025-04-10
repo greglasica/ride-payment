@@ -397,7 +397,7 @@ input[type="text"], input[type="tel"] {
 #toggleDetailsBtn {
     width: 100%;
     padding: 12px;
-    background-color: #007bff;
+    background-color: #28A745;
     color: white;
     border: none;
     border-radius: 5px;
@@ -407,7 +407,7 @@ input[type="text"], input[type="tel"] {
 }
 
 #toggleDetailsBtn:hover {
-    background-color: #0056b3;
+    background-color: #28A745;
 }
 
 #rideDetails {
