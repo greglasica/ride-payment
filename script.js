@@ -230,11 +230,12 @@ function startRide() {
 
 function navigate(app) {
     const destinationInput = document.getElementById('destination');
+    const statusDiv = document.getElementById('status');
     const destination = destinationInput ? destinationInput.value : '';
 
     if (!destination) {
+        statusDiv.innerText = 'No destination provided.';
         console.log('Navigate: No destination provided');
-        document.getElementById('status').innerText = 'No destination provided.';
         return;
     }
 
@@ -250,26 +251,24 @@ function navigate(app) {
 
         if (app === 'google') {
             const googleAppUrl = `comgooglemaps://?saddr=${origin}&daddr=${encodedDest}&directionsmode=driving`;
-            const googleWebUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${encodedDest}&travelmode=driving`;
-            // Try app first, fall back to new tab
+            // Attempt to open Google Maps app only
             window.location.href = googleAppUrl;
             setTimeout(() => {
                 if (document.hasFocus()) {
-                    window.open(googleWebUrl, '_blank');
-                    console.log('Navigate: Google Maps app not found, opened in new tab');
+                    statusDiv.innerText = 'Google Maps app not installed. Please install it to navigate.';
+                    console.log('Navigate: Google Maps app not installed');
                 } else {
                     console.log('Navigate: Google Maps app opened');
                 }
             }, 1000);
         } else if (app === 'apple') {
             const appleAppUrl = `maps://?saddr=${origin}&daddr=${encodedDest}&dirflg=d`;
-            const appleWebUrl = `https://maps.apple.com/?saddr=${origin}&daddr=${encodedDest}&dirflg=d`;
-            // Try app first, fall back to new tab
+            // Attempt to open Apple Maps app only
             window.location.href = appleAppUrl;
             setTimeout(() => {
                 if (document.hasFocus()) {
-                    window.open(appleWebUrl, '_blank');
-                    console.log('Navigate: Apple Maps app not found, opened in new tab');
+                    statusDiv.innerText = 'Apple Maps app not installed. Please install it to navigate.';
+                    console.log('Navigate: Apple Maps app not installed');
                 } else {
                     console.log('Navigate: Apple Maps app opened');
                 }
@@ -277,7 +276,7 @@ function navigate(app) {
         }
     }, error => {
         console.error('Navigate: Geolocation error:', error.message, 'Code:', error.code);
-        document.getElementById('status').innerText = `Navigation failed: ${error.message}`;
+        statusDiv.innerText = `Navigation failed: ${error.message}`;
     }, {
         maximumAge: 0,
         timeout: 10000,
