@@ -122,34 +122,38 @@ function arrive() {
         return;
     }
 
-    if (navigator.geolocation) {
-        statusDiv.innerText = 'Fetching pickup location...';
-        console.log('Arrive: Fetching geolocation...');
-        navigator.geolocation.getCurrentPosition(position => {
-            startLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-            console.log('Arrive: Geolocation success - Start Location:', startLocation);
-            map.setCenter(startLocation);
-            waitStartTime = new Date();
-            console.log('Arrive: waitStartTime set to', waitStartTime);
-            statusDiv.innerText = 'Arrived at pickup.';
-            arriveBtn.style.display = 'none'; // Hide immediately
-            startRideBtn.style.display = 'block'; // Show immediately
-            console.log('Arrive: Button state updated - arriveBtn hidden, startRideBtn shown');
-        }, error => {
-            console.error('Arrive: Geolocation error:', error.message, 'Code:', error.code);
-            statusDiv.innerText = `Geolocation failed: ${error.message}`;
-        }, {
+    if (!navigator.geolocation) {
+        statusDiv.innerText = 'Geolocation not supported.';
+        console.log('Arrive: Geolocation not supported');
+        return;
+    }
+
+    statusDiv.innerText = 'Fetching pickup location...';
+    console.log('Arrive: Fetching geolocation...');
+
+    new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
             maximumAge: 0,
             timeout: 10000,
             enableHighAccuracy: true
         });
-    } else {
-        statusDiv.innerText = 'Geolocation not supported.';
-        console.log('Arrive: Geolocation not supported');
-    }
+    }).then(position => {
+        startLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        };
+        console.log('Arrive: Geolocation success - Start Location:', startLocation);
+        map.setCenter(startLocation);
+        waitStartTime = new Date();
+        console.log('Arrive: waitStartTime set to', waitStartTime);
+        statusDiv.innerText = 'Arrived at pickup.';
+        arriveBtn.style.display = 'none';
+        startRideBtn.style.display = 'block';
+        console.log('Arrive: Button state updated - arriveBtn hidden, startRideBtn shown');
+    }).catch(error => {
+        console.error('Arrive: Geolocation error:', error.message, 'Code:', error.code);
+        statusDiv.innerText = `Geolocation failed: ${error.message}`;
+    });
 }
 
 function startRide() {
@@ -176,53 +180,60 @@ function startRide() {
     const waitTimeMin = waitTimeMs / 60000;
     waitCost = waitTimeMin > 15 ? (waitTimeMin - 15) * 0.50 : 0;
 
-    if (navigator.geolocation) {
-        statusDiv.innerText = waitCost > 0 
-            ? `Wait time cost: $${waitCost.toFixed(2)}. Starting ride...`
-            : 'No wait time cost. Starting ride...';
-        console.log('Start Ride: Fetching current location...');
-        navigator.geolocation.getCurrentPosition(position => {
-            const currentLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-            console.log('Start Ride: Geolocation success - Current Location:', currentLocation);
+    if (!navigator.geolocation) {
+        statusDiv.innerText = 'Geolocation not supported.';
+        console.log('Start Ride: Geolocation not supported');
+        return;
+    }
 
-            const request = {
-                origin: new google.maps.LatLng(currentLocation.lat, currentLocation.lng),
-                destination: destination,
-                travelMode: 'DRIVING'
-            };
-            console.log('Start Ride: Routing request:', request);
+    statusDiv.innerText = waitCost > 0 
+        ? `Wait time cost: $${waitCost.toFixed(2)}. Starting ride...`
+        : 'No wait time cost. Starting ride...';
+    console.log('Start Ride: Fetching current location...');
 
-            directionsService.route(request, (result, status) => {
-                console.log('Start Ride: Directions API response - Status:', status, 'Result:', result);
-                if (status === 'OK') {
-                    directionsRenderer.setDirections(result);
-                    statusDiv.innerText = waitCost > 0 
-                        ? `Wait time cost: $${waitCost.toFixed(2)}. Ride started, route updated.`
-                        : 'Ride started, route updated.';
-                    startRideBtn.style.display = 'none';
-                    finishRideBtn.style.display = 'block';
-                    startTime = new Date();
-                    console.log('Start Ride: Route updated, UI transitioned to finishRideBtn');
-                } else {
-                    statusDiv.innerText = 'Failed to update route: ' + status;
-                    console.error('Start Ride: Directions API failed:', status);
-                }
-            });
-        }, error => {
-            console.error('Start Ride: Geolocation error:', error.message, 'Code:', error.code);
-            statusDiv.innerText = `Geolocation failed: ${error.message}`;
-        }, {
+    new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
             maximumAge: 0,
             timeout: 10000,
             enableHighAccuracy: true
         });
-    } else {
-        statusDiv.innerText = 'Geolocation not supported.';
-        console.log('Start Ride: Geolocation not supported');
-    }
+    }).then(position => {
+        const currentLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        };
+        console.log('Start Ride: Geolocation success - Current Location:', currentLocation);
+
+        const request = {
+            origin: new google.maps.LatLng(currentLocation.lat, currentLocation.lng),
+            destination: destination,
+            travelMode: 'DRIVING'
+        };
+        console.log('Start Ride: Routing request:', request);
+
+        return new Promise((resolveRoute, rejectRoute) => {
+            directionsService.route(request, (result, status) => {
+                console.log('Start Ride: Directions API response - Status:', status, 'Result:', result);
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(result);
+                    resolveRoute();
+                } else {
+                    rejectRoute(new Error('Directions API failed: ' + status));
+                }
+            });
+        });
+    }).then(() => {
+        statusDiv.innerText = waitCost > 0 
+            ? `Wait time cost: $${waitCost.toFixed(2)}. Ride started, route updated.`
+            : 'Ride started, route updated.';
+        startRideBtn.style.display = 'none';
+        finishRideBtn.style.display = 'block';
+        startTime = new Date();
+        console.log('Start Ride: Route updated, UI transitioned to finishRideBtn');
+    }).catch(error => {
+        console.error('Start Ride: Error:', error.message);
+        statusDiv.innerText = `Failed: ${error.message}`;
+    });
 }
 
 // Finish the ride at destination
