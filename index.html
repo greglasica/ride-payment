@@ -11,8 +11,9 @@
     <div class="container">
         <div id="paymentScreen">
             <div class="menu-container">
-                <button id="hamburgerBtn" onclick="toggleMenu(event)">☰</button>                <div id="menuDropdown" class="dropdown-menu">
-                    <button onclick="updateProfile()">Update Profile</button>
+                <button id="hamburgerBtn" onclick="toggleMenu(event)">☰</button>                
+                <div id="menuDropdown" class="dropdown-menu">
+                    <button onclick="showUpdateProfile()">Update Profile</button>
                     <button onclick="showHistory()">View Ride History</button>
                     <button onclick="chargeNow()">Charge Now</button>
                 </div>
@@ -20,7 +21,7 @@
             <h2>Ride Payment</h2>
             <input type="text" id="startAddress" placeholder="Start Address">
             <input type="text" id="destination" placeholder="Destination">
-            <input type="tel" id="clientPhone" placeholder="Client Phone (e.g., +12345678900)">
+            <input type="tel" id="clientPhone" placeholder="Client Phone (e.g., 2345678900)">
             <button id="onOurWayBtn" onclick="onOurWay()">On Our Way</button>
             <button id="arriveBtn" onclick="arrive()" style="display: none;">Arrive</button>
             <button id="startRideBtn" onclick="startRide()" style="display: none;">Start Ride</button>
@@ -111,6 +112,14 @@
                 <h3>Ride History</h3>
                 <div id="historyList"></div>
             </div>
+        </div>
+        <div id="updateProfileScreen" style="display: none;">
+            <h2>Update Profile</h2>
+            <input type="text" id="updateName" placeholder="Name (e.g., Darwin Belleza)">
+            <input type="email" id="updateEmail" placeholder="Email (e.g., darwin@example.com)">
+            <input type="tel" id="updatePhone" placeholder="Phone (e.g., 12345678900)">
+            <button id="saveProfileBtn" onclick="saveProfile()">Save</button>
+            <button id="cancelProfileBtn" onclick="hideUpdateProfile()">Cancel</button>
         </div>
         <div id="status"></div>
     </div>
