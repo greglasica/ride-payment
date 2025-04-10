@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const twilio = require('twilio');
 const Square = require('square');
-const nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer'); // Keep this one
 const path = require('path');
 
 const app = express();
@@ -21,10 +21,15 @@ const squareAppId = process.env.SQUARE_APP_ID;
 const squareLocationId = process.env.SQUARE_LOCATION_ID;
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587, // TLS
+    secure: false, // Use TLS, not SSL
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false // Optional: bypass strict SSL if needed
     }
 });
 
