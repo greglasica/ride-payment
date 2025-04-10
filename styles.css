@@ -423,15 +423,17 @@ input[type="text"], input[type="tel"] {
 }
 
 .tip-btn {
-    padding: 10px;
-    margin: 5px 0;
-    width: 150px;
+    padding: 15px 20px; /* Larger padding for bigger touch area */
+    margin: 10px 0; /* More spacing */
+    width: 90%; /* Full width on mobile */
+    max-width: 250px; /* Cap for larger screens */
     background-color: #ffc107;
     color: black;
     border: none;
-    border-radius: 5px;
-    font-size: 14px;
+    border-radius: 10px; /* Softer corners */
+    font-size: 18px; /* Larger text */
     cursor: pointer;
+    text-align: center; /* Center text */
 }
 
 .tip-btn:hover {
@@ -764,5 +766,16 @@ input:checked + .slider:before {
 
     #manualBtn, #tapBtn, #chargeBtn, #finishBtn {
         width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    .switch {
+        top: 40px; /* Move below title */
+        right: 10px;
+    }
+
+    #paymentScreen h2 {
+        margin-top: 40px; /* Ensure space for toggle */
     }
 }
