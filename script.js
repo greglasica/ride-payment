@@ -434,10 +434,10 @@ async function initializeSquare() {
         if (!window.Square) {
             throw new Error('Square SDK not loaded - check script in index.html');
         }
-        squarePayments = await window.Square.payments(config.squareAppId, 'L2TZNBER8J28H');
+        squarePayments = await window.Square.payments(config.squareAppId, config.squareLocationId);
         console.log('Square Payments initialized successfully');
     } catch (error) {
-        console.error('Failed to initialize Square:', error);
+        console.error('Failed to initialize Square:', error.message);
     }
 }
 
@@ -793,9 +793,17 @@ async function manualPayment() {
     document.getElementById('ride-amount').innerText = window.baseAmount.toFixed(2); // Show base amount
 
     try {
-        if (!squarePayments) {
-            throw new Error('Square payments not initialized');
+        // Wait for squarePayments to be initialized
+        let attempts = 0;
+        while (!squarePayments && attempts < 5) {
+            console.log('Waiting for squarePayments to initialize...');
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+            attempts++;
         }
+        if (!squarePayments) {
+            throw new Error('Square payments not initialized after waiting');
+        }
+
         if (window.card) {
             console.log('Destroying previous card instance');
             await window.card.destroy();
