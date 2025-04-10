@@ -463,6 +463,21 @@ function toggleRideDetails() {
     }
 }
 
+function toggleDarkMode() {
+    const isDark = document.getElementById('darkModeToggle').checked;
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    console.log('Theme switched to:', isDark ? 'dark' : 'light');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.getElementById('darkModeToggle').checked = true;
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+});
+
 // Update profile
 function showUpdateProfile() {
     const updateProfileScreen = document.getElementById('updateProfileScreen');

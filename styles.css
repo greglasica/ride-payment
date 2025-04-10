@@ -1,3 +1,99 @@
+:root {
+    /* Light mode defaults */
+    --background: #f5f5f5;
+    --screen-bg: #f9f9f9;
+    --text: #333;
+    --container-bg: white;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --border: #ddd;
+}
+
+[data-theme="dark"] {
+    /* Dark mode overrides */
+    --background: #121212;
+    --screen-bg: #1e1e1e;
+    --text: #e0e0e0;
+    --container-bg: #2c2c2c;
+    --shadow: rgba(255, 255, 255, 0.1);
+    --border: #444;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--background);
+    color: var(--text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+    background-color: var(--container-bg);
+    border-radius: 10px;
+    box-shadow: 0 2px 5px var(--shadow);
+    width: 90%;
+    max-width: 600px;
+}
+
+h2 {
+    margin-bottom: 10px;
+    color: var(--text);
+}
+
+/* Dark mode toggle switch */
+.switch {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -6,22 +102,24 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f5f5f5;
+    background-color: var(--background); /* Was #f5f5f5 */
+    color: var(--text); /* Add this */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
     text-align: center;
     padding: 20px;
-    background-color: white;
+    background-color: var(--container-bg); /* Was white */
     border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px var(--shadow); /* Was rgba(0, 0, 0, 0.1) */
     width: 90%;
     max-width: 600px;
 }
 
 h2 {
     margin-bottom: 10px;
-    color: #333;
+    color: var(--text); /* Was #333 */
 }
 
 #updateProfileBtn, #historyBtn {
@@ -43,9 +141,11 @@ input[type="text"], input[type="tel"] {
     width: 100%;
     padding: 12px;
     margin: 10px 0;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border); /* Was #ddd */
     border-radius: 5px;
     font-size: 16px;
+    background-color: var(--container-bg); /* Add for dark mode */
+    color: var(--text); /* Add for dark mode */
 }
 
 #price-grid {
@@ -58,11 +158,11 @@ input[type="text"], input[type="tel"] {
 /* New styles for payment options and manual card screens */
 #paymentOptionsScreen {
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: var(--screen-bg); /* Was #f9f9f9 */
     border-radius: 5px;
     max-width: 400px;
     margin: 20px auto;
-    text-align: center; /* Center content */
+    text-align: center;
 }
 
 #paymentOptionsScreen button {
@@ -100,6 +200,58 @@ input[type="text"], input[type="tel"] {
 
 #manualBtn:hover, #tapBtn:hover {
     background-color: #0056b3;
+}
+
+#venmoScreen {
+    padding: 20px;
+    background-color: var(--screen-bg); /* Was #f9f9f9 */
+    border-radius: 5px;
+    max-width: 400px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+#venmoQrCode {
+    width: 300px;
+    height: 300px;
+    margin: 20px auto;
+    display: block;
+    object-fit: contain;
+}
+
+#back-to-options {
+    width: 48%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 10px 1%;
+    cursor: pointer;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+#back-to-options:hover {
+    background-color: #0056b3;
+}
+
+#finishVenmoBtn {
+    width: 100%;
+    padding: 12px;
+    background-color: #17a2b8; /* Match #finishBtn */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#finishVenmoBtn:hover {
+    background-color: #138496; /* Match #finishBtn hover */
 }
 
 #card-container {
@@ -165,7 +317,7 @@ input[type="text"], input[type="tel"] {
 
 #chargeScreen {
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: var(--screen-bg); /* Was #f9f9f9 */
     border-radius: 5px;
     max-width: 400px;
     margin: 20px auto;
@@ -226,7 +378,7 @@ input[type="text"], input[type="tel"] {
 #chargeBtn {
     width: 100%;
     padding: 12px;
-    background-color: #007bff;
+    background-color: #ff6200; /* Orange test */
     color: white;
     border: none;
     border-radius: 5px;
@@ -434,7 +586,7 @@ input[type="text"], input[type="tel"] {
 
 #updateProfileScreen {
     padding: 20px;
-    background-color: #f9f9f9;
+    background-color: var(--screen-bg); /* Was #f9f9f9 */
     border-radius: 5px;
     max-width: 400px;
     margin: 20px auto;
@@ -546,6 +698,62 @@ input[type="text"], input[type="tel"] {
 
 #arriveBtn:hover, #onOurWayBtn:hover, #startRideBtn:hover, #finishRideBtn:hover {
     background-color: #0056b3;
+}
+
+.switch {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+
+#manualCardScreen, #receiptScreen {
+    padding: 20px;
+    background-color: var(--screen-bg);
+    border-radius: 5px;
+    max-width: 400px;
+    margin: 20px auto;
 }
 
 /* Ensure responsiveness for iOS */
