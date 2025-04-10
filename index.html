@@ -11,8 +11,7 @@
     <div class="container">
         <div id="paymentScreen">
             <div class="menu-container">
-                <button id="hamburgerBtn" onclick="toggleMenu()">☰</button>
-                <div id="menuDropdown" class="dropdown-menu">
+                <button id="hamburgerBtn" onclick="toggleMenu(event)">☰</button>                <div id="menuDropdown" class="dropdown-menu">
                     <button onclick="updateProfile()">Update Profile</button>
                     <button onclick="showHistory()">View Ride History</button>
                     <button onclick="chargeNow()">Charge Now</button>
@@ -111,6 +110,5 @@
         <div id="status"></div>
     </div>
     <script src="script.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbAlIDzeZs45VncY9pT-WqnTlNafqj_Gw&libraries=places&callback=initMap" async defer></script>
-    </body>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbAlIDzeZs45VncY9pT-WqnTlNafqj_Gw&libraries=places&callback=initMap" async defer></script>    </body>
     </html>
