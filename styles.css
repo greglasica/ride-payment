@@ -352,6 +352,46 @@ input[type="text"], input[type="tel"] {
     text-align: center; /* Center the arrow */
 }
 
+#updateProfileScreen {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+#updateProfileScreen input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box; /* Ensures padding doesn’t affect width */
+    min-height: 40px; /* Consistent height */
+}
+
+#updateEmail {
+    width: 100%;
+    min-height: 40px;
+}
+
+#saveProfileBtn, #cancelProfileBtn {
+    width: 48%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 10px 1%;
+    cursor: pointer;
+}
+
+#saveProfileBtn:hover, #cancelProfileBtn:hover {
+    background-color: #0056b3;
+}
+
 .back-btn:hover {
     background-color: #0056b3; /* Same hover effect */
 }
