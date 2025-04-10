@@ -62,10 +62,11 @@ app.post('/api/send-sms', (req, res) => {
 app.post('/charge', async (req, res) => {
     const { token, amount } = req.body;
     if (!token || !amount) {
-        console.error('Missing token or amount in /charge request');
+        console.error('Missing token or amount:', { token, amount });
         return res.status(400).json({ status: 'error', message: 'Missing token or amount' });
     }
     try {
+        console.log('Charging payment:', { token, amount });
         const response = await squareClient.paymentsApi.createPayment({
             sourceId: token,
             amountMoney: {
@@ -78,7 +79,11 @@ app.post('/charge', async (req, res) => {
         console.log('Payment successful:', response.result.payment.id);
         res.json({ status: 'success', paymentId: response.result.payment.id });
     } catch (error) {
-        console.error('Payment error:', error.message, error.errors ? error.errors : 'No additional details');
+        console.error('Payment error:', {
+            message: error.message,
+            statusCode: error.statusCode,
+            errors: error.errors ? error.errors : 'No additional details'
+        });
         res.status(500).json({ status: 'error', message: error.message || 'Payment failed' });
     }
 });
