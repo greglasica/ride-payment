@@ -42,10 +42,15 @@ function initAutocomplete() {
 
 // On Our Way - Start ride from driver's current location to customer's Start Address
 function onOurWay() {
-    const startAddress = document.getElementById('startAddress').value;
-    const destination = document.getElementById('destination').value;
-    const clientPhone = document.getElementById('clientPhone').value.trim();
-    const driverName = document.getElementById('driverName').value;
+    const startAddressInput = document.getElementById('startAddress');
+    const destinationInput = document.getElementById('destination');
+    const clientPhoneInput = document.getElementById('clientPhone');
+    const driverNameInput = document.getElementById('driverName');
+
+    const startAddress = startAddressInput ? startAddressInput.value : '';
+    const destination = destinationInput ? destinationInput.value : '';
+    const clientPhone = clientPhoneInput ? clientPhoneInput.value.trim() : '';
+    const driverName = driverNameInput ? driverNameInput.value : '';
 
     if (!startAddress || !destination || !clientPhone) {
         document.getElementById('status').innerText = 'Please enter start address, destination, and client phone.';
@@ -79,9 +84,9 @@ function onOurWay() {
                     document.getElementById('status').innerText = `On our way to pickup. ETA: ${eta}`;
                     document.getElementById('onOurWayBtn').style.display = 'none';
                     document.getElementById('arriveBtn').style.display = 'block';
-                    document.getElementById('rideDetails').style.display = 'none'; // Hide details
+                    document.getElementById('rideDetails').style.display = 'none';
                     document.getElementById('toggleDetailsBtn').innerText = 'Show Ride Details';
-                    document.getElementById('map').style.height = '400px'; // Expand map
+                    document.getElementById('map').style.height = '400px';
                 } else {
                     document.getElementById('status').innerText = 'Failed to calculate ETA.';
                 }
@@ -224,23 +229,23 @@ window.onload = function() {
     let savedPhone = localStorage.getItem('driverPhone');
 
     if (!savedDriver || !savedEmail || !savedPhone) {
-        savedDriver = prompt('What’s your name? (e.g., Darwin Belleza)');
+        savedDriver = prompt('What’s your name? (e.g., Darwin Belleza)') || '';
         if (savedDriver) {
             savedDriver = capitalizeName(savedDriver);
             localStorage.setItem('defaultDriver', savedDriver);
         }
-        savedEmail = prompt('What’s your email? (e.g., darwin@example.com)');
+        savedEmail = prompt('What’s your email? (e.g., darwin@example.com)') || '';
         if (savedEmail) {
             localStorage.setItem('driverEmail', savedEmail);
         }
-        savedPhone = prompt('What’s your phone number? (e.g., +12345678900)');
+        savedPhone = prompt('What’s your phone number? (e.g., 12345678900)') || '';
         if (savedPhone) {
             localStorage.setItem('driverPhone', savedPhone);
         }
     }
 
-    driverNameInput.value = savedDriver || '';
-    driverEmailInput.value = savedEmail || '';
+    if (driverNameInput) driverNameInput.value = savedDriver;
+    if (driverEmailInput) driverEmailInput.value = savedEmail;
     console.log('Calling initializeSquare');
     initializeSquare().then(() => {
         console.log('Square initialized after profile setup');
@@ -721,8 +726,8 @@ function toggleMenu(event) {
 
 document.addEventListener('click', function(event) {
     const menu = document.getElementById('menuDropdown');
-    const menuButton = document.querySelector('.menu-button');
-    if (menu.style.display === 'block' && !menu.contains(event.target) && !menuButton.contains(event.target)) {
+    const menuButton = document.getElementById('hamburgerBtn');
+    if (menu && menu.style.display === 'block' && !menu.contains(event.target) && !menuButton.contains(event.target)) {
         menu.style.display = 'none';
     }
 });
