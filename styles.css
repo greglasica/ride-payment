@@ -339,6 +339,23 @@ input[type="text"], input[type="tel"] {
     cursor: pointer;
 }
 
+.back-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff; /* Same blue as others */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
+    text-align: center; /* Center the arrow */
+}
+
+.back-btn:hover {
+    background-color: #0056b3; /* Same hover effect */
+}
+
 #arriveBtn:hover, #onOurWayBtn:hover, #startRideBtn:hover, #finishRideBtn:hover {
     background-color: #0056b3;
 }
