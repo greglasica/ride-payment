@@ -139,21 +139,19 @@
         <div id="status"></div>
     </div>
     <script src="script.js" defer></script>
-   <script>
-        const debugMode = false; // True for local live-server debug
-        if (debugMode) {
-            document.addEventListener('DOMContentLoaded', () => {
-                const screens = [
-                    'paymentScreen', 'chargeScreen', 'paymentOptionsScreen',
-                    'manualCardScreen', 'venmoScreen', 'receiptScreen', 'updateProfileScreen'
-                ];
-                screens.forEach(id => {
-                    const screen = document.getElementById(id);
-                    if (screen) screen.style.display = 'block';
-                });
-                console.log('Debug mode: All screens displayed');
-            });
-        }
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbAlIDzeZs45VncY9pT-WqnTlNafqj_Gw&libraries=places" async defer></script>
+    <script>
+        window.addEventListener('load', () => {
+            if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+                console.error('Google Maps API not loaded');
+                return;
+            }
+            if (typeof initMap === 'function') {
+                initMap();
+            } else {
+                console.error('initMap not defined');
+            }
+        });
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBbAlIDzeZs45VncY9pT-WqnTlNafqj_Gw&libraries=places&callback=initMap" async defer></script>
     </html>

@@ -1,3 +1,19 @@
+const debugMode = true; // True for local live-server debug
+
+if (debugMode) {
+    document.addEventListener('DOMContentLoaded', () => {
+        const screens = [
+            'paymentScreen', 'chargeScreen', 'paymentOptionsScreen',
+            'manualCardScreen', 'venmoScreen', 'receiptScreen', 'updateProfileScreen'
+        ];
+        screens.forEach(id => {
+            const screen = document.getElementById(id);
+            if (screen) screen.style.display = 'block';
+        });
+        console.log('Debug mode: All screens displayed');
+    });
+}
+
 let map, directionsService, directionsRenderer;
 let startLocation, endLocation, startTime, endTime;
 let squarePayments;
@@ -11,6 +27,13 @@ function setTipLabels(baseAmount) {
     document.getElementById('tip20').innerText = `20% - $${(baseAmount * 0.20).toFixed(2)}`;
     document.getElementById('tip25').innerText = `25% - $${(baseAmount * 0.25).toFixed(2)}`;
     document.getElementById('tipCustom').innerText = 'Custom';
+}
+
+function toggleDarkMode() {
+    const isDark = document.getElementById('darkModeToggle').checked;
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    console.log('Theme switched to:', isDark ? 'dark' : 'light');
 }
 
 // Initialize Google Map
@@ -418,6 +441,14 @@ async function initializeSquare() {
     }
 }
 
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.getElementById('darkModeToggle').checked = true;
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+});
+
 window.onload = function() {
     const driverNameInput = document.getElementById('driverName');
     const driverEmailInput = document.getElementById('driverEmail');
@@ -463,20 +494,6 @@ function toggleRideDetails() {
     }
 }
 
-function toggleDarkMode() {
-    const isDark = document.getElementById('darkModeToggle').checked;
-    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    console.log('Theme switched to:', isDark ? 'dark' : 'light');
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.getElementById('darkModeToggle').checked = true;
-        document.documentElement.setAttribute('data-theme', 'dark');
-    }
-});
 
 // Update profile
 function showUpdateProfile() {
