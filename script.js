@@ -583,15 +583,16 @@ function venmoPayment() {
     statusDiv.innerText = 'Scan the Venmo QR code to pay, then click Finish Payment';
     console.log('Venmo screen displayed');
 
-    // Check if image loads
     const qrImage = document.getElementById('venmoQrCode');
     qrImage.onerror = () => {
-        console.error('Venmo QR image failed to load');
+        console.error('Venmo QR image failed to load from /public/venmo-qr.jpg');
         statusDiv.innerText = 'Error: Venmo QR code image not found';
     };
     qrImage.onload = () => {
         console.log('Venmo QR image loaded successfully');
     };
+    // Force reload to trigger load/error events
+    qrImage.src = qrImage.src + '?' + new Date().getTime();
 }
 
 function backToPaymentOptions() {
@@ -606,20 +607,69 @@ function backToPaymentOptions() {
 
 function finishVenmoPayment() {
     const venmoScreen = document.getElementById('venmoScreen');
-    const receiptScreen = document.getElementById('receiptScreen');
+    const paymentScreen = document.getElementById('paymentScreen');
     const statusDiv = document.getElementById('status');
     const driverName = document.getElementById('driverName').value;
     const amountInput = document.getElementById('amount');
     const amount = parseFloat(amountInput.value);
+    const baseFare = window.baseAmount;
+    const tipAmount = (amount - baseFare).toFixed(2); // Assume no tip for Venmo simplicity
+    const driverPay = (baseFare * 0.72).toFixed(2); // No tip added
 
+    // Hide Venmo screen
     venmoScreen.style.display = 'none';
-    receiptScreen.style.display = 'block';
+
+    // Mock transaction completion
     statusDiv.innerText = 'Venmo payment processed (mocked for web)';
-    console.log('Venmo payment mocked - awaiting verification');
-    setTipLabels(window.baseAmount);
-    updateTipButtonStyles();
-    document.getElementById('driverInfo').innerText = `Driver: ${driverName}`;
-    document.getElementById('rideInfo').innerText = `Amount: $${amount.toFixed(2)}`;
+    console.log('Venmo payment mocked - transaction completed');
+
+    // Save ride history
+    const ride = {
+        dateTime: new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }),
+        fare: baseFare.toFixed(2),
+        tip: "0.00", // No tip for Venmo flow
+        total: baseFare.toFixed(2),
+        driverPay: driverPay,
+        startAddress: document.getElementById('startAddress').value,
+        destination: document.getElementById('destination').value,
+        distance: ((endLocation && startLocation) ? (google.maps.geometry.spherical.computeDistanceBetween(
+            new google.maps.LatLng(startLocation.lat, startLocation.lng),
+            new google.maps.LatLng(endLocation.lat, endLocation.lng)
+        ) / 1609.34).toFixed(1) : 'N/A'),
+        time: ((endTime && startTime) ? ((endTime - startTime) / 60000).toFixed(1) : 'N/A'),
+        waitCost: waitCost.toFixed(2)
+    };
+    let history = JSON.parse(localStorage.getItem('rideHistory') || '[]');
+    history.push(ride);
+    localStorage.setItem('rideHistory', JSON.stringify(history));
+
+    // Reset UI to paymentScreen
+    paymentScreen.style.display = 'block';
+    document.getElementById('chargeScreen').style.display = 'none';
+    document.getElementById('paymentOptionsScreen').style.display = 'none';
+    document.getElementById('receiptScreen').style.display = 'none';
+    document.getElementById('manualCardScreen').style.display = 'none';
+    document.getElementById('venmoScreen').style.display = 'none';
+    amountInput.value = '';
+    document.getElementById('startAddress').value = '';
+    document.getElementById('destination').value = '';
+    document.getElementById('clientPhone').value = '';
+    document.getElementById('onOurWayBtn').style.display = 'block';
+    document.getElementById('arriveBtn').style.display = 'none';
+    document.getElementById('startRideBtn').style.display = 'none';
+    document.getElementById('finishRideBtn').style.display = 'none';
+    document.getElementById('navOptions').style.display = 'none';
+    map.setCenter({ lat: 44.8549, lng: -93.4708 });
+    directionsRenderer.set('directions', null);
+    statusDiv.innerText = 'Payment Successful! Total: $' + baseFare.toFixed(2);
+    statusDiv.className = 'success';
+
+    // Clear status after 5 seconds
+    setTimeout(() => {
+        statusDiv.innerText = '';
+        statusDiv.className = '';
+        console.log('UI reset to paymentScreen after Venmo payment');
+    }, 5000);
 }
 
 // Set amount from price buttons
