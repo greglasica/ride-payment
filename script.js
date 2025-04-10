@@ -3,6 +3,7 @@ let startLocation, endLocation, startTime, endTime;
 let squarePayments;
 let waitStartTime;
 let waitCost = 0;
+let selectedTip = null; // Add at top, after other globals like waitCost
 
 // Helper function to set tip labels
 function setTipLabels(baseAmount) {
@@ -324,7 +325,6 @@ function manualPayment() {
     const paymentOptionsScreen = document.getElementById('paymentOptionsScreen');
     const chargeScreen = document.getElementById('chargeScreen');
     const statusDiv = document.getElementById('status');
-
     paymentOptionsScreen.style.display = 'none';
     chargeScreen.style.display = 'block';
     statusDiv.innerText = 'Select amount for manual card entry';
@@ -428,7 +428,8 @@ async function manualPayment() {
             manualCardScreen.style.display = 'none';
             receiptScreen.style.display = 'block';
             statusDiv.innerText = 'Add tip to complete payment';
-            setTipLabels(window.baseAmount); // Ensure tip labels show
+            setTipLabels(window.baseAmount);
+            updateTipButtonStyles();
         };
     } catch (error) {
         console.error('Card initialization error:', error.message || error);
@@ -452,6 +453,7 @@ function tapPayment() {
 
     // Set tip labels and ride info
     setTipLabels(window.baseAmount);
+    updateTipButtonStyles(); // Add this
     document.getElementById('driverInfo').innerText = `Driver: ${driverName}`;
     document.getElementById('rideInfo').innerText = `Amount: $${window.baseAmount.toFixed(2)} - ${window.paymentNote}`;
 }
@@ -460,9 +462,20 @@ function tapPayment() {
 function addTip(percentage) {
     const amountInput = document.getElementById('amount');
     const statusDiv = document.getElementById('status');
-    let baseAmount = parseFloat(amountInput.value);
+    let baseAmount = parseFloat(amountInput.value) || window.baseAmount; // Fallback to baseAmount
     let tipAmount = 0;
 
+    // Undo if same button pressed again
+    if (selectedTip === percentage) {
+        selectedTip = null;
+        tipAmount = 0;
+        amountInput.value = window.baseAmount.toFixed(2);
+        statusDiv.innerText = 'Tip removed. Total: $' + amountInput.value;
+        updateTipButtonStyles();
+        return;
+    }
+
+    // Set new tip
     if (percentage === 'custom') {
         const customTip = prompt('Enter tip amount (e.g., 5.00)');
         if (customTip && !isNaN(customTip) && customTip >= 0) {
@@ -479,7 +492,22 @@ function addTip(percentage) {
     const totalAmount = (baseAmount + tipAmount).toFixed(2);
     amountInput.value = totalAmount;
     statusDiv.innerText = `Tip added: $${tipAmount.toFixed(2)}. New total: $${totalAmount}`;
+    selectedTip = percentage;
+    updateTipButtonStyles();
 }
+
+function updateTipButtonStyles() {
+    const buttons = ['tip15', 'tip20', 'tip25', 'tipCustom'];
+    buttons.forEach(id => {
+        const button = document.getElementById(id);
+        if (selectedTip === (id === 'tipCustom' ? 'custom' : parseInt(id.replace('tip', '')))) {
+            button.classList.add('selected');
+        } else {
+            button.classList.remove('selected');
+        }
+    });
+}
+
 // Finalize payment, save history, send admin email, reset
 async function finishPayment() {
     const amountInput = document.getElementById('amount');
