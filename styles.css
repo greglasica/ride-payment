@@ -206,20 +206,34 @@ input[type="text"], input[type="tel"] {
     background-color: #333333; /* Darker gray */
 }
 
-#chargeBtn {
-    width: 100%;
+.charge-btn {
+    width: 48%;
     padding: 12px;
-    background-color: #007bff; /* Match other action buttons */
-    color: white;
     border: none;
     border-radius: 5px;
     font-size: 16px;
-    margin: 10px 0;
+    margin: 5px 0;
     cursor: pointer;
+    color: white;
+    transition: background-color 0.3s ease; /* Smooth color change */
 }
 
-#chargeBtn:hover {
-    background-color: #0056b3;
+#chargeButtons .charge-btn:nth-child(odd),
+#moreChargeButtons .charge-btn:nth-child(odd) {
+    background-color: #4A90E2; /* Light Blue */
+}
+
+#chargeButtons .charge-btn:nth-child(even),
+#moreChargeButtons .charge-btn:nth-child(even) {
+    background-color: #9B59B6; /* Soft Purple */
+}
+
+.charge-btn:hover {
+    opacity: 0.9;
+}
+
+.charge-btn.selected {
+    background-color: #28A745; /* Green when selected */
 }
 
 #moreChargeBtn {

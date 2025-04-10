@@ -568,15 +568,33 @@ function tapPayment() {
 // Set amount from price buttons
 function setAmount(price) {
     const amountInput = document.getElementById('amount');
+    const statusDiv = document.getElementById('status');
+    const buttons = document.querySelectorAll('.charge-btn');
+
+    // Remove selected class from all buttons
+    buttons.forEach(btn => btn.classList.remove('selected'));
+
+    // Find and highlight the clicked button
+    const clickedButton = Array.from(buttons).find(btn => btn.textContent === (price === 'variable' ? 'Custom' : `$${price}`));
+    if (clickedButton) {
+        clickedButton.classList.add('selected');
+    }
+
+    // Set amount
     if (price === 'variable') {
         const customAmount = prompt('Enter custom amount (e.g., 27.50)');
         if (customAmount && !isNaN(customAmount) && customAmount > 0) {
             amountInput.value = parseFloat(customAmount).toFixed(2);
+        } else {
+            statusDiv.innerText = 'Invalid amount';
+            statusDiv.className = 'error';
+            clickedButton.classList.remove('selected');
+            return;
         }
     } else {
         amountInput.value = price.toFixed(2);
     }
-    document.getElementById('status').innerText = `Amount set to $${amountInput.value}`;
+    statusDiv.innerText = `Amount set to $${amountInput.value}`;
 }
 
 // Trigger Square payment with preset amount
