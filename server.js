@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const twilio = require('twilio');
 const Square = require('square');
+const nodemailer = require('nodemailer'); // Add this line
 const path = require('path');
 const app = express();
 
@@ -17,8 +18,17 @@ const squareClient = new Square.Client({
 });
 const squareAppId = process.env.SQUARE_APP_ID;
 const squareLocationId = process.env.SQUARE_LOCATION_ID;
+const nodemailer = require('nodemailer');
 
-// ... rest of your server.js code ...
+// Nodemailer setup
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
 
 // SMS endpoint
 app.post('/api/send-sms', (req, res) => {
@@ -53,6 +63,36 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 // Expose Square App ID (optional, for client-side use in script.js)
 app.get('/config', (req, res) => {
     res.json({ squareAppId: squareAppId });
+});
+
+// Email sending endpoint
+app.post('/api/send-email', async (req, res) => {
+    const { adminSubject, adminBody, driverSubject, driverBody, driverEmail } = req.body;
+
+    const adminMailOptions = {
+        from: process.env.EMAIL_USER,
+        to: 'minndriveairport@gmail.com',
+        subject: adminSubject,
+        text: adminBody
+    };
+
+    const driverMailOptions = {
+        from: process.env.EMAIL_USER,
+        to: driverEmail,
+        subject: driverSubject,
+        text: driverBody
+    };
+
+    try {
+        await transporter.sendMail(adminMailOptions);
+        console.log('Admin email sent');
+        await transporter.sendMail(driverMailOptions);
+        console.log('Driver email sent');
+        res.json({ status: 'success' });
+    } catch (error) {
+        console.error('Email send error:', error);
+        res.status(500).json({ status: 'error', message: error.message });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
