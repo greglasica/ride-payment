@@ -183,13 +183,49 @@ function startRide() {
     waitCost = waitTimeMin > 15 ? (waitTimeMin - 15) * 0.50 : 0;
 
     statusDiv.innerText = waitCost > 0 
-        ? `Wait time cost: $${waitCost.toFixed(2)}. Ride started.`
-        : 'Ride started.';
-    startRideBtn.style.display = 'none';
-    finishRideBtn.style.display = 'block';
-    navOptions.style.display = 'flex';
-    startTime = new Date();
-    console.log('Start Ride: UI updated, navigation options shown');
+        ? `Wait time cost: $${waitCost.toFixed(2)}. Starting ride...`
+        : 'No wait time cost. Starting ride...';
+    console.log('Start Ride: Fetching current location...');
+
+    navigator.geolocation.getCurrentPosition(position => {
+        const currentLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        };
+        console.log('Start Ride: Geolocation success - Current Location:', currentLocation);
+
+        const request = {
+            origin: new google.maps.LatLng(currentLocation.lat, currentLocation.lng),
+            destination: destination,
+            travelMode: 'DRIVING'
+        };
+        console.log('Start Ride: Routing request:', request);
+
+        directionsService.route(request, (result, status) => {
+            console.log('Start Ride: Directions API response - Status:', status, 'Result:', result);
+            if (status === 'OK') {
+                directionsRenderer.setDirections(result);
+                statusDiv.innerText = waitCost > 0 
+                    ? `Wait time cost: $${waitCost.toFixed(2)}. Ride started, route updated.`
+                    : 'Ride started, route updated.';
+                startRideBtn.style.display = 'none';
+                finishRideBtn.style.display = 'block';
+                navOptions.style.display = 'flex';
+                startTime = new Date();
+                console.log('Start Ride: Route updated, navigation options shown');
+            } else {
+                statusDiv.innerText = 'Failed to update route: ' + status;
+                console.error('Start Ride: Directions API failed:', status);
+            }
+        });
+    }, error => {
+        console.error('Start Ride: Geolocation error:', error.message, 'Code:', error.code);
+        statusDiv.innerText = `Geolocation failed: ${error.message}`;
+    }, {
+        maximumAge: 0,
+        timeout: 10000,
+        enableHighAccuracy: true
+    });
 }
 
 function navigate(app) {
@@ -198,6 +234,7 @@ function navigate(app) {
 
     if (!destination) {
         console.log('Navigate: No destination provided');
+        document.getElementById('status').innerText = 'No destination provided.';
         return;
     }
 
@@ -212,11 +249,31 @@ function navigate(app) {
         const encodedDest = encodeURIComponent(destination);
 
         if (app === 'google') {
-            window.location.href = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${encodedDest}&travelmode=driving`;
-            console.log('Navigate: Opening Google Maps');
+            const googleAppUrl = `comgooglemaps://?saddr=${origin}&daddr=${encodedDest}&directionsmode=driving`;
+            const googleWebUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${encodedDest}&travelmode=driving`;
+            // Try app first, fall back to new tab
+            window.location.href = googleAppUrl;
+            setTimeout(() => {
+                if (document.hasFocus()) {
+                    window.open(googleWebUrl, '_blank');
+                    console.log('Navigate: Google Maps app not found, opened in new tab');
+                } else {
+                    console.log('Navigate: Google Maps app opened');
+                }
+            }, 1000);
         } else if (app === 'apple') {
-            window.location.href = `maps://?saddr=${origin}&daddr=${encodedDest}&dirflg=d`;
-            console.log('Navigate: Opening Apple Maps');
+            const appleAppUrl = `maps://?saddr=${origin}&daddr=${encodedDest}&dirflg=d`;
+            const appleWebUrl = `https://maps.apple.com/?saddr=${origin}&daddr=${encodedDest}&dirflg=d`;
+            // Try app first, fall back to new tab
+            window.location.href = appleAppUrl;
+            setTimeout(() => {
+                if (document.hasFocus()) {
+                    window.open(appleWebUrl, '_blank');
+                    console.log('Navigate: Apple Maps app not found, opened in new tab');
+                } else {
+                    console.log('Navigate: Apple Maps app opened');
+                }
+            }, 1000);
         }
     }, error => {
         console.error('Navigate: Geolocation error:', error.message, 'Code:', error.code);
@@ -691,7 +748,7 @@ async function finishPayment() {
         waitCost: waitCost.toFixed(2)
     };
     // ... rest of finishPayment (email sending, etc.) ...
-    
+
     let history = JSON.parse(localStorage.getItem('rideHistory') || '[]');
     history.push(ride);
     localStorage.setItem('rideHistory', JSON.stringify(history));
